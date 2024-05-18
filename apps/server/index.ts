@@ -17,7 +17,7 @@ import cors from "cors";
 // }
 
 const app: Express = express();
-const port = process.env.EXPRESS_PORT ?? 3000;
+const port = process.env.EXPRESS_PORT ?? "3000";
 
 app.use(
   cors({
