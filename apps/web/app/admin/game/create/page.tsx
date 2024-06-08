@@ -27,6 +27,7 @@ interface Quiz {
 const CreateGame = () => {
   const [quizTitle, setQuizTitle] = useState<string>('');
   const [questions, setQuestions] = useState<Question[]>([]);
+  const [quizzes, setQuizzes] = useState<Quiz[]>([]);
 
   const handleAddQuestion = () => {
     const newQuestion: Question = {
@@ -78,7 +79,21 @@ const CreateGame = () => {
         )
         } : q)
     )
-  }; 
+  };
+  
+  const handleCreatNewQuiz = () => {
+    const newQuiz: Quiz = {
+      quizId: quizzes.length + 1,
+      quizTitle: quizTitle,
+      questions: questions,
+  };
+    setQuizzes([...quizzes, newQuiz]);
+  }
+
+ 
+  console.log("questions: ", questions)
+  console.log("Quizzes: ", quizzes)
+
 
   return (
     <>
@@ -143,13 +158,29 @@ const CreateGame = () => {
                 </li>
               ))}
           </ul>
-          <div className="mt-4">
+          <div className="mt-4 mb-20 flex justify-center">
             <button
               type="button"
               onClick={handleAddQuestion}
               className="mr-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
             >
               Add New Question
+            </button>
+          </div>
+          <div className="mt-4 flex justify-center">
+          <button
+              type="button"
+              onClick={handleAddQuestion}
+              className="mr-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={handleCreatNewQuiz}
+              className="mr-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+            >
+              Create new quiz
             </button>
           </div>
       </div>
