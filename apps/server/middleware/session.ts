@@ -18,8 +18,7 @@ const sessionOptions = {
     ...(process.env.NODE_ENV === "production"
       ? {
           domain: process.env.COOKIE_BASE,
-          // TODO: Set secure to true when we have HTTPS
-          secure: false,
+          secure: true,
         }
       : {}),
   },
