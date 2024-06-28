@@ -23,7 +23,7 @@ app.use(
   cors({
     origin: [process.env.APP_DOMAIN ?? "http://localhost:3000"],
     credentials: true,
-  })
+  }),
 );
 
 // set defaults
@@ -33,7 +33,7 @@ app.use(helmet());
 app.use(
   bodyParser.urlencoded({
     extended: true,
-  })
+  }),
 );
 
 app.use(sessionMiddleware);
