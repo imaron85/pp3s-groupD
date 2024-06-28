@@ -3,7 +3,6 @@ import * as redis from "redis";
 import ConnectRedis from "connect-redis";
 
 export const redisClient = redis.createClient({
-  legacyMode: true,
   url: process.env.REDIS_URL,
 });
 redisClient.connect().catch((err) => console.error(err));
