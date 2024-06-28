@@ -1,4 +1,3 @@
-import session from "express-session";
 import * as redis from "redis";
 import ConnectRedis from "connect-redis";
 

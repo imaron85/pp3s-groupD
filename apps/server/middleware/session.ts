@@ -9,7 +9,7 @@ const sessionOptions = {
   genid: () => {
     return uuid();
   },
-  name: "arena-web-session",
+  name: "pp3s-session",
   cookie: {
     httpOnly: true,
     secure: false,
