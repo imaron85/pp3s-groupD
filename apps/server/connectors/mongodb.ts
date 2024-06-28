@@ -26,7 +26,7 @@ const choiceSchema = new Schema<Choice>(
     isCorrect: { type: Boolean, required: true },
     imageUrl: { type: String },
   },
-  { _id: true, strict: true },
+  { _id: true, strict: true }
 );
 
 const questionSchema = new Schema<Question>(
@@ -35,7 +35,7 @@ const questionSchema = new Schema<Question>(
     choices: { type: [choiceSchema], required: true },
     imageUrl: { type: String },
   },
-  { _id: true, strict: true },
+  { _id: true, strict: true }
 );
 
 const quizSchema = new Schema<Quiz>(
@@ -46,7 +46,7 @@ const quizSchema = new Schema<Quiz>(
     author: { type: String },
     createdAt: { type: Date, default: Date.now },
   },
-  { _id: true, strict: true },
+  { _id: true, strict: true }
 );
 
 const userAnswerSchema = new Schema<UserAnswer>(
@@ -67,7 +67,7 @@ const userAnswerSchema = new Schema<UserAnswer>(
       },
     ],
   },
-  { _id: true, strict: true },
+  { _id: true, strict: true }
 );
 
 const gameSchema = new Schema<Game>(
@@ -77,7 +77,7 @@ const gameSchema = new Schema<Game>(
     startedAt: { type: Date, default: Date.now },
     endedAt: { type: Date },
   },
-  { _id: true, strict: true },
+  { _id: true, strict: true }
 );
 
 // Create Mongoose models

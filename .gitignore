@@ -27,6 +27,8 @@ out/
 build
 dist
 
+# don't
+package-lock.json
 
 # Debug
 npm-debug.log*
