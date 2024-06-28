@@ -37,8 +37,5 @@ yarn-error.log*
 .DS_Store
 *.pem
 
-# Bun
-bun.lockb
-
 #JetBrains
 .idea/
