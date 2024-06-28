@@ -23,7 +23,7 @@ app.use(
   cors({
     origin: [process.env.APP_DOMAIN ?? "http://localhost:3000"],
     credentials: true,
-  }),
+  })
 );
 
 // set defaults
@@ -33,7 +33,7 @@ app.use(helmet());
 app.use(
   bodyParser.urlencoded({
     extended: true,
-  }),
+  })
 );
 
 app.use(sessionMiddleware);
@@ -42,3 +42,7 @@ app.get("/ping", (_, res) => res.send("pong"));
 
 const server = http.createServer(app);
 server.listen(parseInt(port));
+
+setInterval(() => {
+  console.log("Test log: " + new Date().toLocaleTimeString());
+}, 1000);
