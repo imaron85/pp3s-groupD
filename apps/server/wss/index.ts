@@ -45,6 +45,5 @@ export const wss = Bun.serve<WebSocketData>({
       console.log("close");
       sockets.delete(ws.data.sessionId);
     }, // a socket is closed
-    drain(ws) {},
   }, // handlers
 });
