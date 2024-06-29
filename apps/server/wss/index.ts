@@ -9,7 +9,7 @@ export type WebSocketData = {
 export const sockets = new Map<string, ServerWebSocket<WebSocketData>>();
 
 export const wss = Bun.serve<WebSocketData>({
-  port: 3002,
+  port: process.env.WS_PORT ?? 3002,
   fetch(req, server) {
     const sessionId = cookieParser.signedCookie(
       req.headers.get("Cookie"),
