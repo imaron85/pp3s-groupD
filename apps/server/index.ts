@@ -42,7 +42,3 @@ app.get("/ping", (_, res) => res.send("pong"));
 
 const server = http.createServer(app);
 server.listen(parseInt(port));
-
-setInterval(() => {
-  console.log("Test log: " + new Date().toLocaleTimeString());
-}, 1000);
