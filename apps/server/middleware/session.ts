@@ -7,6 +7,7 @@ const sessionOptions = {
   genid: () => {
     return uuid();
   },
+  proxy: true,
   name: "pp3s-session",
   cookie: {
     httpOnly: true,
