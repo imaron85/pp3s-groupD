@@ -1,4 +1,4 @@
-import { redisClient } from "@/connectors";
+import { redisClient, redisPrefix } from "@/connectors";
 import { ServerWebSocket } from "bun";
 import cookieParser from "cookie-parser";
 
@@ -19,7 +19,7 @@ export const wss = Bun.serve<WebSocketData>({
       return new Response("Unauthorized - No session cookie", { status: 401 });
     }
     redisClient
-      .get(`pp3s-session:${sessionId}`)
+      .get(redisPrefix + sessionId)
       .then((session) => {
         if (!session) {
           return new Response("Unauthorized - Invalid session", {
