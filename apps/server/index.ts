@@ -5,6 +5,7 @@ import { sessionMiddleware } from "./middleware";
 import http from "http";
 import bodyParser from "body-parser";
 import cors from "cors";
+import { wss } from "./wss";
 
 // TODO: Type extension to the session object
 // declare module "express-session" {
@@ -42,3 +43,6 @@ app.get("/ping", (_, res) => res.send("pong"));
 
 const server = http.createServer(app);
 server.listen(parseInt(port));
+
+// Start the WebSocket server
+console.log(wss.id ?? "wss not started");

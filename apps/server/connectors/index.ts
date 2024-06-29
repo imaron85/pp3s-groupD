@@ -1,1 +1,1 @@
-export { redisStore } from "./redis";
+export * from "./redis";

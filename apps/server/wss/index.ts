@@ -1,3 +1,4 @@
+import { redisClient } from "@/connectors";
 import { ServerWebSocket } from "bun";
 import cookieParser from "cookie-parser";
 
@@ -10,21 +11,30 @@ export const sockets = new Map<string, ServerWebSocket<WebSocketData>>();
 export const wss = Bun.serve<WebSocketData>({
   port: 3002,
   fetch(req, server) {
-    // upgrade the request to a WebSocket
-    if (
-      server.upgrade(req, {
-        data: {
-          // pass the express sessionId to the WebSocket
-          sessionId: cookieParser.signedCookie(
-            req.headers.get("Cookie"),
-            process.env.COOKIE_SECRET
-          ),
-        },
-      })
-    ) {
-      return; // do not return a Response
+    const sessionId = cookieParser.signedCookie(
+      req.headers.get("Cookie"),
+      process.env.COOKIE_SECRET
+    );
+    if (!sessionId) {
+      return new Response("Unauthorized - No session cookie", { status: 401 });
     }
-    return new Response("Upgrade failed", { status: 500 });
+    redisClient.get(`pp3s-session:${sessionId}`, (session) => {
+      if (!session) {
+        return new Response("Unauthorized - Invalid session", { status: 401 });
+      }
+      // upgrade the request to a WebSocket
+      if (
+        server.upgrade(req, {
+          data: {
+            // pass the express sessionId to the WebSocket
+            sessionId: sessionId,
+          },
+        })
+      ) {
+        return; // do not return a Response
+      }
+      return new Response("Upgrade failed", { status: 500 });
+    });
   },
   websocket: {
     message(ws, message) {
