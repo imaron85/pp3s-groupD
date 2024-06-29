@@ -17,11 +17,11 @@ import cors from "cors";
 // }
 
 const app: Express = express();
-const port = process.env.EXPRESS_PORT ?? "3000";
+const port = process.env.EXPRESS_PORT ?? "3001";
 
 app.use(
   cors({
-    origin: [process.env.APP_DOMAIN ?? "http://localhost:3000"],
+    origin: [process.env.APP_DOMAIN ?? "http://localhost:3001"],
     credentials: true,
   })
 );
