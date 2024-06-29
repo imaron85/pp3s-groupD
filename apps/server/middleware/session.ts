@@ -2,8 +2,6 @@ import session from "express-session";
 import { v4 as uuid } from "uuid";
 import { redisStore } from "../connectors/";
 
-console.log(process.env.NODE_ENV);
-
 const sessionOptions = {
   secret: process.env?.SESSION_SECRET || "secret",
   genid: () => {

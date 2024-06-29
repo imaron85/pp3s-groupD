@@ -5,6 +5,7 @@ import { sessionMiddleware } from "./middleware";
 import http from "http";
 import bodyParser from "body-parser";
 import cors from "cors";
+import { wss } from "./wss";
 
 // TODO: Type extension to the session object
 // declare module "express-session" {
@@ -17,11 +18,11 @@ import cors from "cors";
 // }
 
 const app: Express = express();
-const port = process.env.EXPRESS_PORT ?? "3000";
+const port = process.env.EXPRESS_PORT ?? "3001";
 
 app.use(
   cors({
-    origin: [process.env.APP_DOMAIN ?? "http://localhost:3000"],
+    origin: [process.env.APP_DOMAIN ?? "http://localhost:3001"],
     credentials: true,
   })
 );
@@ -43,6 +44,5 @@ app.get("/ping", (_, res) => res.send("pong"));
 const server = http.createServer(app);
 server.listen(parseInt(port));
 
-setInterval(() => {
-  console.log("Test log: " + new Date().toLocaleTimeString());
-}, 1000);
+// Start the WebSocket server
+console.log(wss.id ?? "wss not started");
