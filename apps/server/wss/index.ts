@@ -18,23 +18,31 @@ export const wss = Bun.serve<WebSocketData>({
     if (!sessionId) {
       return new Response("Unauthorized - No session cookie", { status: 401 });
     }
-    redisClient.get(`pp3s-session:${sessionId}`, (session) => {
-      if (!session) {
-        return new Response("Unauthorized - Invalid session", { status: 401 });
-      }
-      // upgrade the request to a WebSocket
-      if (
-        server.upgrade(req, {
-          data: {
-            // pass the express sessionId to the WebSocket
-            sessionId: sessionId,
-          },
-        })
-      ) {
-        return; // do not return a Response
-      }
-      return new Response("Upgrade failed", { status: 500 });
-    });
+    redisClient
+      .get(`pp3s-session:${sessionId}`)
+      .then((session) => {
+        if (!session) {
+          return new Response("Unauthorized - Invalid session", {
+            status: 401,
+          });
+        }
+        // upgrade the request to a WebSocket
+        if (
+          server.upgrade(req, {
+            data: {
+              // pass the express sessionId to the WebSocket
+              sessionId: sessionId,
+            },
+          })
+        ) {
+          return; // do not return a Response
+        }
+        return new Response("Upgrade failed", { status: 500 });
+      })
+      .catch((err) => {
+        console.error("Error fetching session:", err);
+        return new Response("Error fetching session", { status: 500 });
+      });
   },
   websocket: {
     message(ws, message) {
