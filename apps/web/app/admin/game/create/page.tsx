@@ -80,19 +80,33 @@ const CreateGame = () => {
         } : q)
     )
   };
-  
-  const handleCreatNewQuiz = () => {
-    const newQuiz: Quiz = {
+
+  const handleCreatNewQuiz = async () => {
+    const newQuiz = {
       quizId: quizzes.length + 1,
       quizTitle: quizTitle,
       questions: questions,
-  };
-    setQuizzes([...quizzes, newQuiz]);
-  }
+    };
+    try {
+      const response = await fetch('http://localhost:3000/quizzes', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newQuiz),
+      });
 
- 
-  console.log("questions: ", questions)
-  console.log("Quizzes: ", quizzes)
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('Quiz created:', data);
+      setQuizzes([...quizzes, data]);
+    } catch (error) {
+      console.error('Failed to create quiz:', error);
+    } 
+};
 
 
   return (
