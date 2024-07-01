@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "src/index.ts",
+  "scripts": {
+    "lint": "eslint . --max-warnings 0"
+  },
   "dependencies": {
     "eslint": "^8.56.0",
     "eslint-config-custom": "*",
