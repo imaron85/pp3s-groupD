@@ -1,0 +1,26 @@
+name: Build and Test Monorepo
+
+on:
+  push:
+    branches:
+      - main  # Or your primary branch
+  pull_request:
+    branches:
+      - main  # Or your primary branch
+
+jobs:
+  build-and-test-monorepo:
+    runs-on: ubuntu-latest
+    env:
+      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+      TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
+      TURBO_REMOTE_ONLY: true
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install
+      - run: bun run lint
+      - run: bun run build
