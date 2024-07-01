@@ -11,7 +11,7 @@
     "@repo/eslint-config": "*",
     "@repo/typescript-config": "*",
     "eslint-plugin-turbo": "^2.0.5",
-    "mongoose": "^5.13.8",
+    "mongoose": "^8.0.0",
     "prettier": "^3.2.5",
     "turbo": "^2.0.5"
   },
