@@ -7,7 +7,7 @@
     "lint": "eslint . --max-warnings 0"
   },
   "dependencies": {
-    "eslint": "^8.56.0",
+    "eslint": "^9.0.0",
     "eslint-config-custom": "*",
     "tsconfig": "*",
     "tsup": "^8.0.0",
