@@ -1,0 +1,26 @@
+name: Build and Test Monorepo
+
+on:
+  push:
+    branches:
+      - main  # Or your primary branch
+  pull_request:
+    branches:
+      - main  # Or your primary branch
+
+jobs:
+  build-and-test-monorepo:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install
+      - run: bun run lint
+      - run: bun run build
