@@ -27,7 +27,7 @@
   },
   "devDependencies": {
     "tsup": "^6.6.3",
-    "tsx": "^3.14.0",
+    "tsx": "^4.0.0",
     "typescript": "^5.2.2",
     "@types/uuid": "^9.0.8",
     "@types/bun": "latest"
