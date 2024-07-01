@@ -8,6 +8,8 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3.1.0",
+    "@eslint/js": "^9.6.0",
     "@repo/eslint-config": "*",
     "@repo/typescript-config": "*",
     "eslint-plugin-turbo": "^2.0.5",
