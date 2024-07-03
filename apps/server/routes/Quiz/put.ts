@@ -1,18 +1,29 @@
 import express, { Request, Response } from "express";
+import { quizRouter } from "./";
+import { Quiz, QuizSchema } from "shared-types";
 
-const router = express.Router();
-
-router.post("/createQuiz", (req: Request, res: Response) => {
+quizRouter.post("/create", (req: Request, res: Response) => {
   // Extract the quiz data from the request body
   const { title, questions } = req.body;
 
-  // Validate the quiz data
-  if (!title || !questions || !Array.isArray(questions)) {
+  let quiz: Quiz;
+  try {
+    quiz = QuizSchema.parse({
+      // TODO: make complete
+      title: title,
+      questions: questions,
+      // author: attach nickname to session id => use that
+      _id: uuid.v4(),
+    });
+  } catch (error) {
     return res.status(400).json({ error: "Invalid quiz data" });
   }
 
-  // Save the quiz to the database or perform any other necessary operations
-  // ...
+  // TODO: replace by actual long lasting db connection object
+  db.quiz.insertOne(quiz).catch((error) => {
+    console.error("Error saving quiz to database:", error);
+    res.status(500).json({ error: "Error saving quiz to database" });
+  });
 
   // Return a success response
   return res.status(201).json({ message: "Quiz created successfully" });
