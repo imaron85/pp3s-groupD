@@ -9,7 +9,9 @@
     "lib": ["dom", "es6"],
     "esModuleInterop": true,
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "models/*": ["./apps/server/models/*"] // Adjust path if necessary
+
     }
   },
   "exclude": ["node_modules", "dist"],

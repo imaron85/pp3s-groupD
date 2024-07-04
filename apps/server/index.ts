@@ -1,52 +1,30 @@
-import cookieParser from "cookie-parser";
-import express, { Express } from "express";
+import express, { Express, Request, Response, NextFunction } from "express";
 import helmet from "helmet";
-import { sessionMiddleware } from "./middleware";
-import http from "http";
 import bodyParser from "body-parser";
 import cors from "cors";
-import { wss } from "./wss";
-import { quizRouter } from "./routes";
-
-// TODO: Type extension to the session object
-// declare module "express-session" {
-//   interface SessionData {
-//     nonce: {
-//       [key in AuthProvider]?: string;
-//     };
-//     user?: SessionUser;
-//   }
-// }
+import {quizRouter} from "./routes/Quiz"; // Default export does not need curly braces
+import { connectDB } from './connectors/mongodb';
+import http from "http";
 
 const app: Express = express();
 const port = process.env.EXPRESS_PORT ?? "3001";
 
-app.use(
-  cors({
-    origin: [process.env.APP_DOMAIN ?? "http://localhost:3001"],
+connectDB().catch(err => console.error('Failed to connect to MongoDB', err));
+
+app.use(cors({
+    origin: process.env.APP_DOMAIN || "http://localhost:3000", // Allow requests from frontend running on port 3000
     credentials: true,
-  })
-);
-
-// set defaults
+}));
 app.use(bodyParser.json({ limit: "50mb" }));
-app.use(cookieParser(process.env.COOKIE_SECRET));
 app.use(helmet());
-app.use(
-  bodyParser.urlencoded({
-    extended: true,
-  })
-);
+app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use(sessionMiddleware);
+app.use("/quiz", quizRouter); // Define routes before error handling middleware
 
-app.get("/ping", (_, res) => res.send("pong"));
-
-// add routes
-app.use("/quiz", quizRouter);
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+    console.error(err.stack);
+    res.status(500).send('Something broke!');
+});
 
 const server = http.createServer(app);
-server.listen(parseInt(port));
-
-// Start the WebSocket server
-console.log(wss.id ?? "wss not started");
+server.listen(parseInt(port), () => console.log(`Server running on port ${port}`));
