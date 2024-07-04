@@ -1,19 +1,16 @@
 {
   "compilerOptions": {
+    "target": "ES6",
     "module": "commonjs",
-    "target": "esnext",
-    "moduleResolution": "node",
-    "sourceMap": true,
-    "outDir": "dist",
-    "allowJs": true,
-    "lib": ["dom", "es6"],
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
     "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
     "paths": {
-      "@/*": ["./*"],
-      "models/*": ["./apps/server/models/*"] // Adjust path if necessary
-
+      "shared-types": ["../../packages/shared-types/dist"]
     }
   },
-  "exclude": ["node_modules", "dist"],
-  "include": ["**/*.ts"]
+  "include": ["src/**/*"]
 }

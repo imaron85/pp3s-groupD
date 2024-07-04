@@ -6,23 +6,20 @@ import Switch from "react-switch";
 import { QueryClient, useMutation, useQueryClient } from '@tanstack/react-query';
 import { UseMutationOptions } from '@tanstack/react-query';
 
-
-interface Answer {
-  answerId: number;
-  answerText: string;
+interface Choice {
+  text: string;
   isCorrect: boolean;
 }
 
 interface Question {
-  questionId: number;
   questionText: string;
-  answers: Answer[];
+  choices: Choice[];
 }
 
 interface Quiz {
-  quizId: number;
-  quizTitle: string;
+  title: string;
   questions: Question[];
+  author: string;
 }
 
 interface QuizCreationResponse {
@@ -30,6 +27,7 @@ interface QuizCreationResponse {
 }
 
 const createQuiz = async (newQuiz: Quiz): Promise<QuizCreationResponse> => {
+  console.log("Sending quiz data:", newQuiz);
   const response = await fetch('http://localhost:3001/quiz/create', {
     method: 'POST',
     headers: {
@@ -37,12 +35,15 @@ const createQuiz = async (newQuiz: Quiz): Promise<QuizCreationResponse> => {
     },
     body: JSON.stringify(newQuiz),
   });
+
+  console.log("Received response:", response);
   if (!response.ok) {
+    const errorText = await response.text();
+    console.error("Failed to create quiz:", errorText);
     throw new Error('Failed to create quiz');
   }
   return await response.json();
 };
-
 
 const CreateGame = () => {
   const [quizTitle, setQuizTitle] = useState<string>('');
@@ -69,52 +70,49 @@ const CreateGame = () => {
 
   const mutation = useMutation<QuizCreationResponse, Error, Quiz, unknown>({ mutationFn: createQuiz, ...mutationOptions }, new QueryClient());
 
-
   const handleAddQuestion = () => {
     const newQuestion: Question = {
-      questionId: questions.length + 1,
       questionText: '',
-      answers: Array.from({ length: 4 }, (_, id) => ({
-        answerId: id,
-        answerText: '',
+      choices: Array.from({ length: 4 }, () => ({
+        text: '',
         isCorrect: false
       }))
     };
     setQuestions(currentQuestions => [...currentQuestions, newQuestion]);
   };
 
-  const handleQuestionTextChange = (newQuestionText: string, questionId: number) => {
+  const handleQuestionTextChange = (newQuestionText: string, questionIndex: number) => {
     setQuestions(currentQuestions =>
-      currentQuestions.map(question =>
-        question.questionId === questionId ? { ...question, questionText: newQuestionText } : question
+      currentQuestions.map((question, index) =>
+        index === questionIndex ? { ...question, questionText: newQuestionText } : question
       )
     );
   };
 
-  const handleAnswerTextChange = (newAnswerText: string, questionId: number, answerId: number) => {
+  const handleChoiceTextChange = (newChoiceText: string, questionIndex: number, choiceIndex: number) => {
     setQuestions(currentQuestions =>
-      currentQuestions.map(question =>
-        question.questionId === questionId ? {
+      currentQuestions.map((question, qIndex) =>
+        qIndex === questionIndex ? {
           ...question,
-          answers: question.answers.map(answer =>
-            answer.answerId === answerId ? { ...answer, answerText: newAnswerText } : answer
+          choices: question.choices.map((choice, cIndex) =>
+            cIndex === choiceIndex ? { ...choice, text: newChoiceText } : choice
           )
         } : question
       )
     );
   };
 
-  const handleDeleteQuestion = (questionId: number) => {
-    setQuestions(currentQuestions => currentQuestions.filter(question => question.questionId !== questionId));
+  const handleDeleteQuestion = (questionIndex: number) => {
+    setQuestions(currentQuestions => currentQuestions.filter((_, index) => index !== questionIndex));
   };
 
-  const handleCorrectAnswerToggle = (questionId: number, answerId: number, isCorrect: boolean) => {
+  const handleCorrectChoiceToggle = (questionIndex: number, choiceIndex: number, isCorrect: boolean) => {
     setQuestions(quizQuestions =>
-      quizQuestions.map(q =>
-        q.questionId === questionId ? {
+      quizQuestions.map((q, qIndex) =>
+        qIndex === questionIndex ? {
           ...q,
-          answers: q.answers.map(a =>
-            a.answerId === answerId ? { ...a, isCorrect: isCorrect } : a
+          choices: q.choices.map((c, cIndex) =>
+            cIndex === choiceIndex ? { ...c, isCorrect: isCorrect } : c
           )
         } : q
       )
@@ -123,19 +121,17 @@ const CreateGame = () => {
 
   const handleCreateNewQuiz = async () => {
     const newQuiz: Quiz = {
-      quizId: 0, // Replace with the appropriate value
-      quizTitle: quizTitle,
+      title: quizTitle,
       questions: questions.map(q => ({
-        questionId: 0, // Replace with the appropriate value
         questionText: q.questionText,
-        answers: q.answers.map(a => ({
-          answerId: 0, // Replace with the appropriate value
-          answerText: a.answerText,
-          isCorrect: a.isCorrect,
+        choices: q.choices.map(c => ({
+          text: c.text,
+          isCorrect: c.isCorrect,
         }))
-      }))
+      })),
+      author: "Test Author" // Assuming a default or user-provided author
     };
-
+    console.log("Creating new quiz with data:", newQuiz);
     mutation.mutate(newQuiz);
   };
 
@@ -155,14 +151,14 @@ const CreateGame = () => {
           />
         </div>
         <ul className="ml-5">
-          {questions.map((question) => (
-            <li key={question.questionId} className="mb-6 border-b pb-4">
+          {questions.map((question, questionIndex) => (
+            <li key={questionIndex} className="mb-6 border-b pb-4">
               <div className="mb-2 ">
                 <label className="block text-sm font-medium text-gray-700 flex justify-between items-center">
-                  Question {question.questionId}:
+                  Question {questionIndex + 1}:
                   <button
                     type="button"
-                    onClick={() => handleDeleteQuestion(question.questionId)}
+                    onClick={() => handleDeleteQuestion(questionIndex)}
                     className="text-red-600 hover:underline"
                   >
                     Delete Question
@@ -173,24 +169,24 @@ const CreateGame = () => {
                   type="text"
                   placeholder="Enter question"
                   value={question.questionText}
-                  onChange={(q) => handleQuestionTextChange(q.target.value, question.questionId)}
+                  onChange={(q) => handleQuestionTextChange(q.target.value, questionIndex)}
                 />
               </div>
               <div className="ml-5">
-                <label className="block text-sm font-medium text-gray-700 flex justify-between items-center">Answers:</label>
-                {question.answers.map((answer) => (
-                  <div key={answer.answerId}>
+                <label className="block text-sm font-medium text-gray-700 flex justify-between items-center">Choices:</label>
+                {question.choices.map((choice, choiceIndex) => (
+                  <div key={choiceIndex}>
                     <label className="block text-sm font-medium text-gray-700 flex justify-between items-center">
                       <input
                         type="text"
-                        value={answer.answerText}
-                        onChange={(a) => handleAnswerTextChange(a.target.value, question.questionId, answer.answerId)}
-                        placeholder="Enter answer"
+                        value={choice.text}
+                        onChange={(a) => handleChoiceTextChange(a.target.value, questionIndex, choiceIndex)}
+                        placeholder="Enter choice"
                         className="mr-10 mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                       />
                       <Switch
-                        checked={answer.isCorrect}
-                        onChange={(checked: boolean) => handleCorrectAnswerToggle(question.questionId, answer.answerId, checked)}
+                        checked={choice.isCorrect}
+                        onChange={(checked: boolean) => handleCorrectChoiceToggle(questionIndex, choiceIndex, checked)}
                       />
                     </label>
                   </div>
