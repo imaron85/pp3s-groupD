@@ -20,6 +20,7 @@ This will start the Documentation. You can edit it and see your changes live.
 
 ```bash
 # Run this in the root folder
+sudo docker compose up
 bun run dev
 ```
 
