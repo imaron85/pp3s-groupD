@@ -1,8 +1,7 @@
 import express, { Request, Response } from "express";
-
-const router = express.Router();
+import { quizRouter } from ".";
 
 // GET all quizes
-router.get("/", (req: Request, res: Response) => {
+quizRouter.get("/", (req: Request, res: Response) => {
   res.send("GET all quizes");
 });

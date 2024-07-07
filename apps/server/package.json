@@ -4,8 +4,8 @@
   "main": "index.ts",
   "scripts": {
     "build": "tsup",
-    "start": "bun dist/index.js",
-    "dev": "bun --watch index.ts",
+    "start": "bun --bun dist/index.js",
+    "dev": "bun --bun --watch index.ts",
     "lint": "eslint ."
   },
   "author": "",

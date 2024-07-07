@@ -19,7 +19,7 @@ export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const newSocket = new WebSocket(
-      process.env.WS_URL || "ws://localhost:3001"
+      process.env.WS_URL || "ws://localhost:3002"
     );
 
     newSocket.onopen = () => {
