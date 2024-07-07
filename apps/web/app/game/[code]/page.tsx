@@ -3,6 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import GameLoading from "./loading";
+import GameError from "./error";
 
 export default function Game({ params: { code } }: any) {
   const { isPending, error, data } = useQuery({
@@ -13,5 +14,10 @@ export default function Game({ params: { code } }: any) {
     },
   });
 
-  return <>{isPending ? <GameLoading /> : ""}</>;
+  return (
+    <>
+      {isPending ? <GameLoading /> : ""}
+      {error ? <GameError /> : ""}
+    </>
+  );
 }
