@@ -6,6 +6,7 @@ export type WebSocketData = {
   sessionId: string;
 };
 
+
 export const sockets = new Map<string, ServerWebSocket<WebSocketData>>();
 
 export const wss = Bun.serve<WebSocketData>({

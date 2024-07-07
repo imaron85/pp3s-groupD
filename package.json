@@ -34,5 +34,10 @@
     "react-query": "^3.39.3",
     "react-switch": "^7.0.0",
     "shared-types": "^1.0.0"
+    "clsx": "^2.1.1",
+    "input-otp": "^1.2.4",
+    "install": "^0.13.0",
+    "react-digit-input": "^2.1.0",
+    "tailwind-merge": "^2.3.0"
   }
 }
