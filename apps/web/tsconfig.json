@@ -15,9 +15,7 @@
     "next.config.js",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts",
-    "../../packages/ui/src/input-otp.tsx",
-    "../../packages/ui/src/utils.ts"
+    ".next/types/**/*.ts"
   ],
   "exclude": ["node_modules"]
 }
