@@ -1,5 +1,5 @@
 import { ServerWebSocket } from "bun";
-import { WebSocketData } from "..";
+import { games, WebSocketData } from "..";
 import { WsMessage } from "shared-types";
 
 export const leaveHandler = (
@@ -12,5 +12,7 @@ export const leaveHandler = (
   };
   ws.publish(`game-${ws.data.gameCode!}`, JSON.stringify(leaveMessage));
   ws.unsubscribe(`game-${ws.data.gameCode!}`);
+  ws.data.gameSubscription?.unsubscribe();
+  games.removePlayer(ws.data.gameCode, ws.data.sessionId);
   delete ws.data.gameCode;
 };

@@ -31,7 +31,7 @@ export default function Game({ params: { code } }: any) {
 
   const listen = (ws: WebSocket, ev: MessageEvent<any>) => {
     const msg = WsMessage.parse(JSON.parse(ev.data));
-
+    console.log("2Message from server ", msg);
     switch (msg.command) {
       case "players": {
         setPlayers(msg.payload);
@@ -50,18 +50,13 @@ export default function Game({ params: { code } }: any) {
   };
 
   useEffect(() => {
-    if (!error && ws.socket) {
+    if (ws.socket) {
       ws.socket.onmessage = (event) => {
-        console.log("Message from server ", event.data);
+        console.log("1Message from server ", event.data);
         listen(ws.socket!, event);
       };
 
       setGameState("waiting");
-
-      return () => {
-        ws.socket!.onmessage = (ev: MessageEvent<any>) =>
-          console.log("New message from server ", ev.data);
-      };
     }
     if (error) {
       setGameState("error");

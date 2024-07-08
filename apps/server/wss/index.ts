@@ -3,59 +3,56 @@ import { ServerWebSocket } from "bun";
 import cookieParser from "cookie-parser";
 import { Game, WsMessage } from "shared-types";
 import { leaveHandler } from "./handlers";
+import { BehaviorSubject, Subscription } from "rxjs";
 
 export type WebSocketData = {
   sessionId: string;
   gameCode?: string;
+  gameSubscription?: Subscription;
 };
 
 export const sockets = new Map<string, ServerWebSocket<WebSocketData>>();
 export const nicknames = new Map<string, string>();
-export const games = new Map<string, Game>();
+// export const games = new Map<string, Game>();
+export const gameSubject = new BehaviorSubject<Map<string, Game>>(new Map());
+
+export const games = {
+  set(key: string, value: Game) {
+    gameSubject.next(new Map(gameSubject.value).set(key, value));
+  },
+  delete(key: string) {
+    const tmp = new Map(gameSubject.value);
+    tmp.delete(key);
+    gameSubject.next(tmp);
+  },
+  modify(key: string, changes: Partial<Game>) {
+    const tmp = new Map(gameSubject.value);
+    tmp.set(key, { ...tmp.get(key), ...changes });
+    gameSubject.next(tmp);
+  },
+  has(key: string) {
+    return gameSubject.value.has(key);
+  },
+  get(key: string) {
+    return gameSubject.value.get(key);
+  },
+  addPlayer(key: string, player: string) {
+    const tmp = new Map(gameSubject.value);
+    tmp.get(key)?.players.add(player);
+    gameSubject.next(tmp);
+  },
+  removePlayer(key: string, player: string) {
+    const tmp = new Map(gameSubject.value);
+    tmp.get(key)?.players.delete(player);
+    gameSubject.next(tmp);
+  },
+};
 
 // TODO: Remove when game creation is implemented
 games.set("123", { gameCode: "123", players: new Set(), joinable: true });
 
 export const wss = Bun.serve<WebSocketData>({
   port: process.env.WS_PORT ?? 3002,
-  // async fetch(req, server) {
-  //   const sessionId = cookieParser.signedCookie(
-  //     req.headers.get("Cookie"),
-  //     process.env.COOKIE_SECRET
-  //   );
-  //   console.log("Session ID:", sessionId);
-  //   if (!sessionId) {
-  //     return new Response("Unauthorized - No session cookie", { status: 401 });
-  //   }
-  //   redisClient
-  //     .get(redisPrefix + sessionId)
-  //     .then((session) => {
-  //       if (!session) {
-  //         console.log("Session not found");
-  //         return new Response("Not Acceptable - Invalid session", {
-  //           status: 406,
-  //         });
-  //       }
-  //       console.log("Session found");
-  //       // upgrade the request to a WebSocket
-  //       if (
-  //         server.upgrade(req, {
-  //           data: {
-  //             // pass the express sessionId to the WebSocket
-  //             sessionId: sessionId,
-  //           },
-  //         })
-  //       ) {
-  //         console.log("Upgrade successful");
-  //         return; // do not return a Response
-  //       }
-  //       return new Response("Upgrade failed", { status: 500 });
-  //     })
-  //     .catch((err) => {
-  //       console.error("Error fetching session:", err);
-  //       //return new Response("Error fetching session", { status: 500 });
-  //     });
-  // },
   async fetch(req, server) {
     const sessionId = cookieParser.signedCookie(
       decodeURIComponent(req.headers.get("Cookie")?.split("=")[1]),
@@ -124,7 +121,11 @@ export const wss = Bun.serve<WebSocketData>({
       sockets.set(ws.data.sessionId, ws);
     }, // a socket is opened
     close(ws, code, message) {
-      console.log("Websocket closed, Session ID:", ws.data.sessionId);
+      ws.data.gameSubscription?.unsubscribe();
+
+      if (ws.data.gameCode) {
+        games.removePlayer(ws.data.gameCode, ws.data.sessionId);
+      }
       sockets.delete(ws.data.sessionId);
     }, // a socket is closed
   }, // handlers
