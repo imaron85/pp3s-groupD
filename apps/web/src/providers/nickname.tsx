@@ -1,3 +1,5 @@
+"use client";
+
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { use, useEffect, useState } from "react";
