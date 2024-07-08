@@ -7,21 +7,19 @@ import GameError from "./error";
 import { useWebSocket } from "../../../src/providers";
 import { WsMessage } from "shared-types";
 import { backendUrl } from "../../../src/util";
+import axios from "axios";
 
 export default function Game({ params: { code } }: any) {
   const ws = useWebSocket();
   const { isPending, error, data } = useQuery({
     queryKey: ["game", code],
     queryFn: async () => {
-      if (!ws.socket) {
-        throw new Error("WebSocket not connected");
-      }
-      const response = await fetch(`${backendUrl}/game/${code}`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch game data");
-      }
-      return await response.json();
+      const response = await axios.get(`${backendUrl}/game/${code}`, {
+        withCredentials: true,
+      });
+      return response.data;
     },
+    enabled: !!ws.socket,
   });
 
   console.log("Game data:", data);
@@ -52,16 +50,9 @@ export default function Game({ params: { code } }: any) {
 
   useEffect(() => {
     if (!error) {
-      const joinMessage: WsMessage = {
-        command: "join",
-        payload: code,
-      };
-
       ws.socket?.addEventListener("message", (ev: MessageEvent<any>) =>
         listen(ws.socket!, ev)
       );
-
-      ws.socket?.send(JSON.stringify(joinMessage));
 
       return () => {
         ws.socket?.removeEventListener("message", (ev: MessageEvent<any>) =>

@@ -87,12 +87,12 @@ export const wss = Bun.serve<WebSocketData>({
     ) {
       return;
     }
-    return new Response("Error upgrading to WebSocket", { status: 500 });
+    return new Response("Error upgrading to WebSocket" + sessionId, { status: 500 });
   },
   websocket: {
     message(ws, message) {
       console.log(message);
-      const msg = WsMessage.parse(message);
+      const msg = WsMessage.parse(JSON.parse(message as string));
 
       switch (msg.command) {
         case "leave": {

@@ -7,6 +7,7 @@ import React, {
   useEffect,
   useState,
 } from "react";
+import axios from "axios";
 import { backendUrl } from "../util";
 
 interface WebSocketContextType {
@@ -21,7 +22,7 @@ export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
   console.log("WebSocketProvider Rendering:", socket);
 
   useEffect(() => {
-    fetch(backendUrl + "/ping").then(() => {
+    axios.get(backendUrl + "/ping", { withCredentials: true }).then(() => {
       const newSocket = new WebSocket(
         process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:3002"
       );

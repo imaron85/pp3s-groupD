@@ -21,7 +21,7 @@ const sessionOptions = {
         }
       : {}),
   },
-  resave: true,
+  resave: false,
   saveUninitialized: true,
   store: redisStore,
 } as const;

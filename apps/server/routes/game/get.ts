@@ -12,7 +12,7 @@ export const get = async (req, res) => {
   console.log("Session joining game:", req.session.id);
   const ws = sockets.get(req.session.id);
 
-  console.log(sockets);
+  console.log("Sockets: ", sockets.keys());
   try {
     ws.subscribe(`game-${req.params.code}`);
     ws.publish(`game-${req.params.code}`, JSON.stringify(joinMessage));
