@@ -10,39 +10,75 @@ export const sockets = new Map<string, ServerWebSocket<WebSocketData>>();
 
 export const wss = Bun.serve<WebSocketData>({
   port: process.env.WS_PORT ?? 3002,
-  fetch(req, server) {
+  // async fetch(req, server) {
+  //   const sessionId = cookieParser.signedCookie(
+  //     req.headers.get("Cookie"),
+  //     process.env.COOKIE_SECRET
+  //   );
+  //   console.log("Session ID:", sessionId);
+  //   if (!sessionId) {
+  //     return new Response("Unauthorized - No session cookie", { status: 401 });
+  //   }
+  //   redisClient
+  //     .get(redisPrefix + sessionId)
+  //     .then((session) => {
+  //       if (!session) {
+  //         console.log("Session not found");
+  //         return new Response("Not Acceptable - Invalid session", {
+  //           status: 406,
+  //         });
+  //       }
+  //       console.log("Session found");
+  //       // upgrade the request to a WebSocket
+  //       if (
+  //         server.upgrade(req, {
+  //           data: {
+  //             // pass the express sessionId to the WebSocket
+  //             sessionId: sessionId,
+  //           },
+  //         })
+  //       ) {
+  //         console.log("Upgrade successful");
+  //         return; // do not return a Response
+  //       }
+  //       return new Response("Upgrade failed", { status: 500 });
+  //     })
+  //     .catch((err) => {
+  //       console.error("Error fetching session:", err);
+  //       //return new Response("Error fetching session", { status: 500 });
+  //     });
+  // },
+  async fetch(req, server) {
     const sessionId = cookieParser.signedCookie(
       req.headers.get("Cookie"),
       process.env.COOKIE_SECRET
     );
+
     if (!sessionId) {
-      return new Response("Unauthorized - No session cookie", { status: 401 });
-    }
-    redisClient
-      .get(redisPrefix + sessionId)
-      .then((session) => {
-        if (!session) {
-          return new Response("Unauthorized - Invalid session", {
-            status: 401,
-          });
-        }
-        // upgrade the request to a WebSocket
-        if (
-          server.upgrade(req, {
-            data: {
-              // pass the express sessionId to the WebSocket
-              sessionId: sessionId,
-            },
-          })
-        ) {
-          return; // do not return a Response
-        }
-        return new Response("Upgrade failed", { status: 500 });
-      })
-      .catch((err) => {
-        console.error("Error fetching session:", err);
-        return new Response("Error fetching session", { status: 500 });
+      return new Response("Unauthorized - No session cookie", {
+        status: 401,
       });
+    }
+
+    const session = await redisClient.get(redisPrefix + sessionId);
+
+    if (!session) {
+      return new Response("Not Acceptable - Invalid session", {
+        status: 406,
+      });
+    }
+
+    if (
+      server.upgrade(req, {
+        data: {
+          // pass the express sessionId to the WebSocket
+          sessionId: sessionId,
+        },
+      })
+    ) {
+      return;
+    }
+    return new Response("Error fetching session", { status: 500 });
   },
   websocket: {
     message(ws, message) {
