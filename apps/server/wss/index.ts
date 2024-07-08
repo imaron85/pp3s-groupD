@@ -1,9 +1,12 @@
 import { redisClient, redisPrefix } from "@/connectors";
 import { ServerWebSocket } from "bun";
 import cookieParser from "cookie-parser";
+import { WsMessage } from "shared-types";
+import { leaveHandler } from "./handlers";
 
 export type WebSocketData = {
   sessionId: string;
+  gameCode?: string;
 };
 
 export const sockets = new Map<string, ServerWebSocket<WebSocketData>>();
@@ -89,9 +92,21 @@ export const wss = Bun.serve<WebSocketData>({
   websocket: {
     message(ws, message) {
       console.log(message);
+      const msg = WsMessage.parse(message);
+
+      switch (msg.command) {
+        case "leave": {
+          leaveHandler(ws, msg);
+          break;
+        }
+        default: {
+          console.log("Unknown command:", msg);
+          break;
+        }
+      }
     }, // a message is received
     open(ws) {
-      console.log("open");
+      console.log("Websocket opened, Session ID:", ws.data.sessionId);
       // Check if the sessionId already exists in the sockets map
       // If it does, close the existing socket and replace it with the new one
       if (sockets.has(ws.data.sessionId)) {
@@ -102,7 +117,7 @@ export const wss = Bun.serve<WebSocketData>({
       sockets.set(ws.data.sessionId, ws);
     }, // a socket is opened
     close(ws, code, message) {
-      console.log("close");
+      console.log("Websocket closed, Session ID:", ws.data.sessionId);
       sockets.delete(ws.data.sessionId);
     }, // a socket is closed
   }, // handlers

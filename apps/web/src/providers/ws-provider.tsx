@@ -18,8 +18,9 @@ const WebSocketContext = createContext<WebSocketContextType>({ socket: null });
 export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
   const [socket, setSocket] = useState<WebSocket | null>(null);
 
+  console.log("WebSocketProvider Rendering:", socket);
+
   useEffect(() => {
-    // TODO: fix to use correct urls
     fetch(backendUrl + "/ping").then(() => {
       const newSocket = new WebSocket(
         process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:3002"
@@ -41,6 +42,7 @@ export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
 
       // Cleanup on component unmount to prevent memory leaks
       return () => {
+        console.log("Cleaning up WebSocket");
         if (newSocket) newSocket.close();
       };
     });
