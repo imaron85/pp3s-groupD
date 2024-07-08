@@ -50,8 +50,8 @@ export const wss = Bun.serve<WebSocketData>({
   // },
   async fetch(req, server) {
     const sessionId = cookieParser.signedCookie(
-      req.headers.get("Cookie"),
-      process.env.COOKIE_SECRET
+      decodeURIComponent(req.headers.get("Cookie")?.split("=")[1]),
+      process.env.SESSION_SECRET || "secret"
     );
 
     if (!sessionId) {
@@ -60,7 +60,13 @@ export const wss = Bun.serve<WebSocketData>({
       });
     }
 
-    const session = await redisClient.get(redisPrefix + sessionId);
+    console.log("Fetching session:", sessionId);
+    const session = await redisClient
+      .get(redisPrefix + sessionId)
+      .catch((err) => {
+        console.error("Error fetching session:", err);
+        return new Response("Error fetching session", { status: 500 });
+      });
 
     if (!session) {
       return new Response("Not Acceptable - Invalid session", {
@@ -78,7 +84,7 @@ export const wss = Bun.serve<WebSocketData>({
     ) {
       return;
     }
-    return new Response("Error fetching session", { status: 500 });
+    return new Response("Error upgrading to WebSocket", { status: 500 });
   },
   websocket: {
     message(ws, message) {
