@@ -1,7 +1,7 @@
 import { redisClient, redisPrefix } from "@/connectors";
 import { ServerWebSocket } from "bun";
 import cookieParser from "cookie-parser";
-import { WsMessage } from "shared-types";
+import { Game, WsMessage } from "shared-types";
 import { leaveHandler } from "./handlers";
 
 export type WebSocketData = {
@@ -10,6 +10,11 @@ export type WebSocketData = {
 };
 
 export const sockets = new Map<string, ServerWebSocket<WebSocketData>>();
+export const nicknames = new Map<string, string>();
+export const games = new Map<string, Game>();
+
+// TODO: Remove when game creation is implemented
+games.set("123", { gameCode: "123", players: new Set(), joinable: true });
 
 export const wss = Bun.serve<WebSocketData>({
   port: process.env.WS_PORT ?? 3002,
@@ -87,7 +92,9 @@ export const wss = Bun.serve<WebSocketData>({
     ) {
       return;
     }
-    return new Response("Error upgrading to WebSocket" + sessionId, { status: 500 });
+    return new Response("Error upgrading to WebSocket" + sessionId, {
+      status: 500,
+    });
   },
   websocket: {
     message(ws, message) {
