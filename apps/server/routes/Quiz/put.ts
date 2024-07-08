@@ -47,4 +47,18 @@ quizRouter.get("/test", (req: Request, res: Response) => {
     res.status(200).json({ message: "Endpoint is working" });
 });
 
+quizRouter.get("/quizzes", async (req: Request, res: Response) => {
+    console.log("Received request to /quizzes");
+    try {
+        const quizzes = await QuizModel.find();
+        console.log("Fetched quizzes successfully:", quizzes);
+        return res.status(200).json({ quizzes });
+    } catch (error) {
+        console.error("Error fetching quizzes:", error);
+        return res.status(500).json({ error: "Failed to fetch quizzes" });
+    }
+});
+
+
+
 export default quizRouter;
