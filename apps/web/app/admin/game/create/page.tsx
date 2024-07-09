@@ -5,6 +5,7 @@ import { useState } from "react";
 import Switch from "react-switch";
 import { QueryClient, useMutation, useQueryClient } from '@tanstack/react-query';
 import { UseMutationOptions } from '@tanstack/react-query';
+import Link from "next/link";
 
 interface Choice {
   text: string;
@@ -51,7 +52,7 @@ const CreateGame = () => {
   const [quizDescription, setQuizDescription] = useState<string>('');
   const [questions, setQuestions] = useState<Question[]>([]);
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
-
+  const [isQuizCreated, setIsQuizCreated] = useState<boolean>(false);
   const queryClient = useQueryClient();
 
   const mutationOptions: UseMutationOptions<QuizCreationResponse, Error, Quiz, unknown> = {
@@ -64,6 +65,7 @@ const CreateGame = () => {
       setQuizDescription('');
       setQuestions([]);
       alert('Quiz created successfully!');
+      setIsQuizCreated(true);
     },
     onError: (error: Error) => {
       console.error("Error creating quiz:", error.message);
@@ -149,9 +151,32 @@ const CreateGame = () => {
     mutation.mutate(newQuiz);
   };
 
+  const resetForm = () => {
+    setQuizTitle('');
+    setQuizDescription('');
+    setQuestions([]);
+    setIsQuizCreated(false); 
+  };
+
+  if (isQuizCreated) {
+    return (
+      <>
+        <div className="p-4 max-w-2xl mx-auto text-center">
+          <h1 className="text-2xl font-bold mb-4">{quizTitle} Successfully Created</h1>
+          <div className="space-x-4">
+        <button onClick={resetForm} className="px-4 py-2 text-white rounded bg-black hover:bg-gray-800">Create New Quiz</button>
+        <Link href="/start" className="inline-block px-4 py-2 text-white rounded bg-black hover:bg-gray-800">Start Quiz</Link>
+      <Link href="/" className="inline-block px-4 py-2 text-white rounded bg-black hover:bg-gray-800">Home</Link>
+
+
+      </div>
+        </div>
+      </>
+    );
+  }
+
   return (
     <>
-      <Navbar />
       <div className="p-4 max-w-2xl mx-auto">
         <h1 className="text-2xl font-bold mb-4">Create new quiz</h1>
         <div>
