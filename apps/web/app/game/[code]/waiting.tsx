@@ -20,7 +20,7 @@ export default function GameWaiting({
             Waiting Lobby
           </h1>
           <div className="bg-primary px-6 py-3 rounded-lg text-primary-foreground font-semibold text-2xl">
-            {code}
+            {code.match(/.{1,3}/g)?.join(" ")}
           </div>
           <p>Waiting for other players to join...</p>
           <ul className="w-full space-y-4">

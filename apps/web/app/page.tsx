@@ -11,7 +11,7 @@ export default function Home() {
       </div>
       <div className="flex flex-col gap-4 mt-12">
         <Link
-          href="/create"
+          href="/start"
           className="inline-flex items-center justify-center w-full h-14 px-12 text-lg rounded-md bg-neutral-200 text-black shadow transition-colors hover:bg-black/30 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
         >
           Create Game
