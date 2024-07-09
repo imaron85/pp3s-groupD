@@ -1,17 +1,21 @@
 import { WsMessage } from "shared-types";
 import { WebSocketContextType } from "../../../src/providers";
 import QRCode from "react-qr-code";
+import { Dispatch, SetStateAction } from "react";
+import { GameState } from "./page";
 
 export default function GameWaiting({
   code,
   players,
   isOwner,
   ws,
+  setGameState,
 }: {
   code: string;
   players: string[];
   isOwner: boolean;
   ws: WebSocketContextType;
+  setGameState: Dispatch<SetStateAction<GameState>>;
 }) {
   return (
     <div className="flex flex-col items-center justify-center h-screen bg-background">
@@ -45,6 +49,7 @@ export default function GameWaiting({
               payload: code,
             };
             ws.socket!.send(JSON.stringify(msg));
+            setGameState("game");
           }}
           className="w-full max-w-md mt-12 bg-primary text-primary-foreground text-center hover:bg-primary/90 p-2 rounded-xl"
         >

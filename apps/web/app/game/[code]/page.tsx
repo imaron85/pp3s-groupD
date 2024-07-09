@@ -5,11 +5,12 @@ import { useEffect, useState } from "react";
 import GameLoading from "./loading";
 import GameError from "./error";
 import { useWebSocket } from "../../../src/providers";
-import { Question, WsMessage } from "shared-types";
+import { Question, QuestionSchema, WsMessage } from "shared-types";
 import { backendUrl } from "../../../src/util";
 import axios, { AxiosError } from "axios";
 import GameWaiting from "./waiting";
 import GamePlaying from "./playing";
+import { useAnimation } from "framer-motion";
 
 export type GameState =
   | "loading"
@@ -20,7 +21,27 @@ export type GameState =
 
 export default function Game({ params: { code } }: any) {
   const ws = useWebSocket();
+  const controls = useAnimation();
+
+  const [gameState, setGameState] = useState<GameState>("loading");
+  const [players, setPlayers] = useState<string[]>([]);
+  const [currentQuestion, setCurrentQuestion] = useState<
+    Question & { endTime: Date }
+  >();
+  const [timeRemaining, setTimeRemaining] = useState<string>("");
+
+  const calcRemainingTime = (endTime: Date) => {
+    const time = Math.floor((endTime.getTime() - Date.now()) / 1000);
+    const minutes = Math.floor(time / 60);
+    const seconds = time % 60;
+
+    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+  };
+
   const { isPending, error, data } = useQuery({
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
     retry: (failureCount, error: AxiosError) => {
       // Do not retry if the game does not exist or is running
       if (error.response?.status === 404 || error.response?.status === 403) {
@@ -36,12 +57,8 @@ export default function Game({ params: { code } }: any) {
       setPlayers(response.data.players);
       return response.data;
     },
-    enabled: !!ws.socket,
+    enabled: !!ws.socket && gameState === "waiting",
   });
-
-  const [gameState, setGameState] = useState<GameState>("loading");
-  const [players, setPlayers] = useState<string[]>([]);
-  const [currentQuestion, setCurrentQuestion] = useState<Question>();
 
   const listen = (ws: WebSocket, ev: MessageEvent<any>) => {
     const msg = WsMessage.parse(JSON.parse(ev.data));
@@ -54,6 +71,13 @@ export default function Game({ params: { code } }: any) {
       }
       case "start": {
         setGameState("game");
+        break;
+      }
+      case "question": {
+        setCurrentQuestion({
+          endTime: new Date(msg.payload.endTime),
+          ...msg.payload.question,
+        });
         break;
       }
       default: {
@@ -77,6 +101,21 @@ export default function Game({ params: { code } }: any) {
     }
   }, [isPending, error, data, ws.socket]);
 
+  useEffect(() => {
+    if (gameState === "game") {
+      setTimeRemaining(calcRemainingTime(new Date(currentQuestion?.endTime!)));
+      const interval = setInterval(() => {
+        setTimeRemaining(
+          calcRemainingTime(new Date(currentQuestion?.endTime!))
+        );
+      }, 1000);
+
+      return () => {
+        clearInterval(interval);
+      };
+    }
+  }, [gameState, currentQuestion]);
+
   return (
     <>
       {isPending ? <GameLoading /> : ""}
@@ -96,10 +135,14 @@ export default function Game({ params: { code } }: any) {
           )}
           {gameState === "game" ? (
             <GamePlaying
-              endTime={new Date()}
-              question=""
-              answers={[]}
+              question={currentQuestion?.questionText || ""}
+              answers={
+                currentQuestion?.choices?.map((choice) => choice.text) || []
+              }
               onAnswer={(answer) => {}}
+              isOwner={data.isOwner}
+              remainingTime={timeRemaining}
+              controls={controls}
             />
           ) : (
             ""

@@ -16,6 +16,8 @@ export const put = async (req, res) => {
       joinable: true,
       players: new Set(),
       quiz: await QuizModel.findOne({ _id: req.body.quizId }),
+      currentQuestion: -1,
+      scores: {},
     };
 
     games.set(newGame.gameCode, newGame);

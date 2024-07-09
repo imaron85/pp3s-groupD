@@ -2,7 +2,7 @@ import { redisClient, redisPrefix } from "@/connectors";
 import { ServerWebSocket } from "bun";
 import cookieParser from "cookie-parser";
 import { Game, WsMessage } from "shared-types";
-import { leaveHandler } from "./handlers";
+import { leaveHandler, nextHandler, startHandler } from "./handlers";
 import { BehaviorSubject, Subscription } from "rxjs";
 
 export type WebSocketData = {
@@ -38,12 +38,24 @@ export const games = {
   },
   addPlayer(key: string, player: string) {
     const tmp = new Map(gameSubject.value);
-    tmp.get(key)?.players.add(player);
+    tmp.get(key).players.add(player);
+    tmp.get(key).scores[player] = 0;
     gameSubject.next(tmp);
   },
   removePlayer(key: string, player: string) {
     const tmp = new Map(gameSubject.value);
     tmp.get(key)?.players.delete(player);
+    delete tmp.get(key)?.scores[player];
+    gameSubject.next(tmp);
+  },
+  nextQuestion(key: string) {
+    const tmp = new Map(gameSubject.value);
+    tmp.get(key).currentQuestion += 1;
+    gameSubject.next(tmp);
+  },
+  addScore(key: string, player: string, score: number) {
+    const tmp = new Map(gameSubject.value);
+    tmp.get(key).scores[player] += score;
     gameSubject.next(tmp);
   },
 };
@@ -97,6 +109,14 @@ export const wss = Bun.serve<WebSocketData>({
       switch (msg.command) {
         case "leave": {
           leaveHandler(ws, msg);
+          break;
+        }
+        case "next": {
+          nextHandler(ws, msg);
+          break;
+        }
+        case "start": {
+          startHandler(ws, msg);
           break;
         }
         default: {
