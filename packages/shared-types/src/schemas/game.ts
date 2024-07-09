@@ -31,4 +31,4 @@ export const GameSchema = z
   })
   .strict();
 
-export type Game = z.infer<typeof GameSchema>;
+// export type Game = z.infer<typeof GameSchema>;

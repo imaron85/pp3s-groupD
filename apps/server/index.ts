@@ -8,6 +8,8 @@ import { connectDB } from "./connectors/mongodb";
 import http from "http";
 import { wss } from "./wss";
 import { sessionMiddleware } from "./middleware";
+import { gameRouter, nicknameRouter } from "./routes";
+import { BehaviorSubject } from "rxjs";
 
 const app: Express = express();
 const port = process.env.EXPRESS_PORT ?? "3001";
@@ -28,7 +30,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(sessionMiddleware);
 
 app.get("/ping", (_, res) => res.send("pong"));
-app.use("/quiz", quizRouter); // Ensure this line is correct and the router is registered
+app.use("/quiz", quizRouter);
+app.use("/game", gameRouter);
+app.use("/nickname", nicknameRouter);
 
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.error(err.stack);

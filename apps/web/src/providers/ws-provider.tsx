@@ -7,6 +7,8 @@ import React, {
   useEffect,
   useState,
 } from "react";
+import axios from "axios";
+import { backendUrl } from "../util";
 
 interface WebSocketContextType {
   socket: WebSocket | null;
@@ -17,29 +19,34 @@ const WebSocketContext = createContext<WebSocketContextType>({ socket: null });
 export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
   const [socket, setSocket] = useState<WebSocket | null>(null);
 
+  console.log("WebSocketProvider Rendering:", socket);
+
   useEffect(() => {
-    const newSocket = new WebSocket(
-      process.env.WS_URL || "ws://localhost:3002"
-    );
+    axios.get(backendUrl + "/ping", { withCredentials: true }).then(() => {
+      const newSocket = new WebSocket(
+        process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:3002"
+      );
 
-    newSocket.onopen = () => {
-      console.log("WebSocket connection opened");
-      setSocket(newSocket);
-    };
+      newSocket.onopen = () => {
+        console.log("WebSocket connection opened");
+        setSocket(newSocket);
+      };
 
-    newSocket.onclose = () => {
-      console.log("WebSocket connection closed");
-      setSocket(null);
-    };
+      newSocket.onclose = () => {
+        console.log("WebSocket connection closed");
+        setSocket(null);
+      };
 
-    newSocket.onerror = (event) => {
-      console.error("WebSocket error:", event);
-    };
+      newSocket.onerror = (event) => {
+        console.error("WebSocket error:", event);
+      };
 
-    // Cleanup on component unmount to prevent memory leaks
-    return () => {
-      if (newSocket) newSocket.close();
-    };
+      // Cleanup on component unmount to prevent memory leaks
+      return () => {
+        console.log("Cleaning up WebSocket");
+        if (newSocket) newSocket.close();
+      };
+    });
   }, []); // Empty dependency array ensures the effect runs only once on mount
 
   return (
