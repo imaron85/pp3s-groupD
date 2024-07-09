@@ -5,16 +5,29 @@ import { useEffect, useState } from "react";
 import GameLoading from "./loading";
 import GameError from "./error";
 import { useWebSocket } from "../../../src/providers";
-import { WsMessage } from "shared-types";
+import { Question, WsMessage } from "shared-types";
 import { backendUrl } from "../../../src/util";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import GameWaiting from "./waiting";
+import GamePlaying from "./playing";
 
-type GameState = "loading" | "waiting" | "error" | "game";
+export type GameState =
+  | "loading"
+  | "waiting"
+  | "error"
+  | "game"
+  | "leaderboard";
 
 export default function Game({ params: { code } }: any) {
   const ws = useWebSocket();
   const { isPending, error, data } = useQuery({
+    retry: (failureCount, error: AxiosError) => {
+      // Do not retry if the game does not exist or is running
+      if (error.response?.status === 404 || error.response?.status === 403) {
+        return false;
+      }
+      return failureCount <= 5; // Retry up to 5 times
+    },
     queryKey: ["game", code],
     queryFn: async () => {
       const response = await axios.get(`${backendUrl}/game/${code}`, {
@@ -28,6 +41,7 @@ export default function Game({ params: { code } }: any) {
 
   const [gameState, setGameState] = useState<GameState>("loading");
   const [players, setPlayers] = useState<string[]>([]);
+  const [currentQuestion, setCurrentQuestion] = useState<Question>();
 
   const listen = (ws: WebSocket, ev: MessageEvent<any>) => {
     const msg = WsMessage.parse(JSON.parse(ev.data));
@@ -38,8 +52,8 @@ export default function Game({ params: { code } }: any) {
         console.log("Joined");
         break;
       }
-      case "leave": {
-        console.log("Left");
+      case "start": {
+        setGameState("game");
         break;
       }
       default: {
@@ -66,18 +80,31 @@ export default function Game({ params: { code } }: any) {
   return (
     <>
       {isPending ? <GameLoading /> : ""}
-      {error ? <GameError /> : ""}
+      {error ? <GameError error={error} /> : ""}
       {data ? (
-        gameState === "waiting" ? (
-          <GameWaiting
-            code={code}
-            players={players}
-            isOwner={data.isOwner}
-            ws={ws}
-          />
-        ) : (
-          ""
-        )
+        <>
+          {gameState === "waiting" ? (
+            <GameWaiting
+              code={code}
+              players={players}
+              isOwner={data.isOwner}
+              ws={ws}
+              setGameState={setGameState}
+            />
+          ) : (
+            ""
+          )}
+          {gameState === "game" ? (
+            <GamePlaying
+              endTime={new Date()}
+              question=""
+              answers={[]}
+              onAnswer={(answer) => {}}
+            />
+          ) : (
+            ""
+          )}
+        </>
       ) : (
         ""
       )}
