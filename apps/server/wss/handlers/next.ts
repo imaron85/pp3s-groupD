@@ -9,7 +9,12 @@ export const nextHandler = (
   const game = games.get(ws.data.gameCode!)!;
 
   const nextQuestion: WsQuestion = {
-    question: game.quiz.questions[game.currentQuestion + 1],
+    question: {
+      ...game.quiz.questions[game.currentQuestion + 1],
+      choices: game.quiz.questions[game.currentQuestion + 1].choices.map(
+        (choice) => ({ ...choice, isCorrect: undefined })
+      ),
+    },
     // TODO: Add end time
     endTime: new Date(Date.now() + 30000),
   };
