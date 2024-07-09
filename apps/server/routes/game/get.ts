@@ -39,8 +39,9 @@ export const get = async (req, res) => {
             (id) => nicknames.get(id)
           ),
         };
-
-        ws.publish(`game-${req.params.code}`, JSON.stringify(newPlayers));
+        if (newGames.get(ws.data.gameCode).joinable)
+          ws.publish(`game-${req.params.code}`, JSON.stringify(newPlayers));
+        else ws.data.gameSubscription?.unsubscribe();
       },
     });
     res.status(200).json({

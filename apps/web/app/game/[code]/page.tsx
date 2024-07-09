@@ -5,12 +5,13 @@ import { useEffect, useState } from "react";
 import GameLoading from "./loading";
 import GameError from "./error";
 import { useWebSocket } from "../../../src/providers";
-import { Question, QuestionSchema, WsMessage } from "shared-types";
+import { Question, QuestionSchema, WsMessage, WsScores } from "shared-types";
 import { backendUrl } from "../../../src/util";
 import axios, { AxiosError } from "axios";
 import GameWaiting from "./waiting";
 import GamePlaying from "./playing";
 import { useAnimation } from "framer-motion";
+import { GameLeaderboard } from "./leaderboard";
 
 export type GameState =
   | "loading"
@@ -30,6 +31,10 @@ export default function Game({ params: { code } }: any) {
     Question & { endTime: Date }
   >();
   const [timeRemaining, setTimeRemaining] = useState<string>("");
+  const [leaderboard, setLeaderboard] = useState<{
+    leaderboard: WsScores;
+    isFinal: boolean;
+  }>({ leaderboard: [], isFinal: false });
 
   const calcRemainingTime = (endTime: Date) => {
     const time = Math.floor((endTime.getTime() - Date.now()) / 1000);
@@ -81,6 +86,12 @@ export default function Game({ params: { code } }: any) {
           endTime: new Date(msg.payload.endTime),
           ...msg.payload.question,
         });
+        setGameState("game");
+        break;
+      }
+      case "leaderboard": {
+        setLeaderboard(msg.payload);
+        setGameState("leaderboard");
         break;
       }
       default: {
@@ -147,8 +158,7 @@ export default function Game({ params: { code } }: any) {
                 const msg: WsMessage = {
                   command: "answer",
                   payload: {
-                    questionId: currentQuestion?._id!,
-                    answerId: currentQuestion?.choices![answer]!._id,
+                    answerIndex: answer,
                   },
                 };
                 ws.socket!.send(JSON.stringify(msg));
@@ -164,6 +174,17 @@ export default function Game({ params: { code } }: any) {
             <GameLoading
               text="Waiting for other players to answer"
               time={timeRemaining}
+            />
+          ) : (
+            ""
+          )}
+          {gameState === "leaderboard" ? (
+            <GameLeaderboard
+              scores={leaderboard.leaderboard}
+              isFinal={leaderboard.isFinal}
+              isOwner={data.isOwner}
+              ws={ws}
+              setGameState={setGameState}
             />
           ) : (
             ""
