@@ -1,5 +1,6 @@
 import { WsMessage } from "shared-types";
 import { WebSocketContextType } from "../../../src/providers";
+import QRCode from "react-qr-code";
 
 export default function GameWaiting({
   code,
@@ -14,6 +15,7 @@ export default function GameWaiting({
 }) {
   return (
     <div className="flex flex-col items-center justify-center h-screen bg-background">
+      <QRCode value={`https://pp3s.aron.cx/game/${code}`} className="mb-12" />
       <div className="bg-card p-8 rounded-lg shadow-lg w-full max-w-md">
         <div className="flex flex-col items-center justify-center space-y-6">
           <h1 className="text-3xl font-bold text-card-foreground">
