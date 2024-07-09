@@ -1,6 +1,19 @@
-import { WsScores } from "shared-types";
+import { WsMessage, WsScores } from "shared-types";
+import { WebSocketContextType } from "../../../src/providers";
+import { Dispatch, SetStateAction } from "react";
+import { GameState } from "./page";
 
-export const GameLeaderboard = ({ scores }: { scores: WsScores }) => {
+export const GameLeaderboard = ({
+  scores,
+  isOwner,
+  ws,
+  setGameState,
+}: {
+  scores: WsScores;
+  isOwner: boolean;
+  ws: WebSocketContextType;
+  setGameState: Dispatch<SetStateAction<GameState>>;
+}) => {
   const top = ["1st", "2nd", "3rd", "4th", "5th", "6th"];
 
   return (
@@ -26,6 +39,22 @@ export const GameLeaderboard = ({ scores }: { scores: WsScores }) => {
           ))}
         </div>
       </div>
+      {isOwner && ws.socket ? (
+        <button
+          onClick={() => {
+            const msg: WsMessage = {
+              command: "next",
+            };
+            ws.socket!.send(JSON.stringify(msg));
+            setGameState("game");
+          }}
+          className="w-full max-w-md mt-12 bg-primary text-primary-foreground text-center hover:bg-primary/90 p-2 rounded-xl"
+        >
+          Next Question
+        </button>
+      ) : (
+        ""
+      )}
     </div>
   );
 };

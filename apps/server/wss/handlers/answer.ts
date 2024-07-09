@@ -25,7 +25,7 @@ export const answerHandler = (
   }
 
   if (games.allAnswered(ws.data.gameCode!)) {
-    games.resetRound(ws.data.gameCode!, ws.data.sessionId);
-    leaderboardHandler(ws, msg);
+    games.resetRound(ws.data.gameCode!);
+    leaderboardHandler(ws, msg, true);
   }
 };

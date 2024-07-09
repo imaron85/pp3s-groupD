@@ -15,6 +15,7 @@ export type WebSocketData = {
   sessionId: string;
   gameCode?: string;
   gameSubscription?: Subscription;
+  timer?: Timer;
 };
 
 export const sockets = new Map<string, ServerWebSocket<WebSocketData>>();
@@ -67,9 +68,12 @@ export const games = {
     };
     gameSubject.next(tmp);
   },
-  resetRound(key: string, player: string) {
+  resetRound(key: string) {
     const tmp = new Map(gameSubject.value);
-    tmp.get(key).scores[player] = { ...tmp.get(key).scores[player], round: 0 };
+    const innerTmp = tmp.get(key);
+    innerTmp.players.forEach((p) => {
+      innerTmp.scores[p] = { ...innerTmp.scores[p], round: 0 };
+    });
     gameSubject.next(tmp);
   },
   allAnswered(key: string) {

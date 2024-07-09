@@ -5,9 +5,15 @@ import { nextHandler } from "./next";
 
 export const leaderboardHandler = (
   ws: ServerWebSocket<WebSocketData>,
-  msg?: WsMessage
+  msg?: WsMessage,
+  internal?: boolean
 ) => {
   const game = games.get(ws.data.gameCode!)!;
+
+  if (game.owner !== ws.data.sessionId && !internal) return;
+
+  if (ws.data.timer) clearTimeout(ws.data.timer);
+  games.resetRound(ws.data.gameCode!);
 
   const leaderboard: WsScores = Object.keys(game.scores).map((player) => ({
     player: nicknames.get(player),

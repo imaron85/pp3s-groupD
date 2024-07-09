@@ -176,7 +176,12 @@ export default function Game({ params: { code } }: any) {
             ""
           )}
           {gameState === "leaderboard" ? (
-            <GameLeaderboard scores={leaderboard} />
+            <GameLeaderboard
+              scores={leaderboard}
+              isOwner={data.isOwner}
+              ws={ws}
+              setGameState={setGameState}
+            />
           ) : (
             ""
           )}
