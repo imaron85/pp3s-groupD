@@ -29,7 +29,7 @@ interface QuizCreationResponse {
 
 const createQuiz = async (newQuiz: Quiz): Promise<QuizCreationResponse> => {
   console.log("Sending quiz data:", newQuiz);
-  const response = await fetch('http://localhost:3001/quiz/create', {
+  const response = await fetch(process.env.NEXT_PUBLIC_BACKEND_URL + '/quiz/create', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
