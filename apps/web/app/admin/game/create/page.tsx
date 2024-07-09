@@ -18,6 +18,7 @@ interface Question {
 
 interface Quiz {
   title: string;
+  description: string;
   questions: Question[];
   author: string;
 }
@@ -47,6 +48,7 @@ const createQuiz = async (newQuiz: Quiz): Promise<QuizCreationResponse> => {
 
 const CreateGame = () => {
   const [quizTitle, setQuizTitle] = useState<string>('');
+  const [quizDescription, setQuizDescription] = useState<string>('');
   const [questions, setQuestions] = useState<Question[]>([]);
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
 
@@ -59,6 +61,7 @@ const CreateGame = () => {
       });
       setQuizzes(currentQuizzes => [...currentQuizzes, data.quiz]);
       setQuizTitle('');
+      setQuizDescription('');
       setQuestions([]);
       alert('Quiz created successfully!');
     },
@@ -120,8 +123,19 @@ const CreateGame = () => {
   };
 
   const handleCreateNewQuiz = async () => {
+
+    if (!quizTitle || !quizDescription || questions.some(q => !q.questionText || q.choices.some(c => !c.text))) {
+      alert('All fields must be filled.');
+      return;
+    }
+    if (questions.some(q => !q.choices.some(c => c.isCorrect))) {
+      alert('Each question must have at least one correct answer.');
+      return;
+    }
+
     const newQuiz: Quiz = {
       title: quizTitle,
+      description: quizDescription,
       questions: questions.map(q => ({
         questionText: q.questionText,
         choices: q.choices.map(c => ({
@@ -147,6 +161,15 @@ const CreateGame = () => {
             value={quizTitle}
             onChange={(e) => setQuizTitle(e.target.value)}
             placeholder="Enter quiz title"
+            className="mb-4 mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 flex justify-between items-center">Quiz title:</label>
+          <textarea
+            value={quizDescription}
+            onChange={(e) => setQuizDescription(e.target.value)}
+            placeholder="Enter quiz description"
             className="mb-4 mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
           />
         </div>
@@ -199,7 +222,7 @@ const CreateGame = () => {
           <button
             type="button"
             onClick={handleAddQuestion}
-            className="mr-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            className="mr-2 px-4 py-2 bg-black text-white rounded hover:bg-gray-800"
           >
             Add New Question
           </button>
@@ -215,7 +238,7 @@ const CreateGame = () => {
           <button
             type="button"
             onClick={handleCreateNewQuiz}
-            className="mr-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+            className="mr-2 px-4 py-2 text-white rounded bg-black hover:bg-gray-800"
           >
             Create new quiz
           </button>
