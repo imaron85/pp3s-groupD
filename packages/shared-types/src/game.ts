@@ -7,6 +7,8 @@ export const Game = z.object({
   joinable: z.boolean(),
   players: z.set(z.string()),
   quiz: QuizSchema,
+  currentQuestion: z.number(),
+  scores: z.record(z.number()),
 });
 
 export type Game = z.infer<typeof Game>;

@@ -26,7 +26,7 @@ const PlayerPage = () => {
   const [quiz, setQuiz] = useState<Quiz | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
-  const id = "c1e046bc-ccb0-455b-a528-947d6c648c9c";
+  const id = "f56ec298-55fc-42b3-9e24-c89341459355";
 
   useEffect(() => {
     const fetchQuiz = async () => {
