@@ -139,7 +139,16 @@ export default function Game({ params: { code } }: any) {
               answers={
                 currentQuestion?.choices?.map((choice) => choice.text) || []
               }
-              onAnswer={(answer) => {}}
+              onAnswer={(answer) => {
+                const msg: WsMessage = {
+                  command: "answer",
+                  payload: {
+                    questionId: currentQuestion?._id!,
+                    answerId: currentQuestion?.choices![answer]!._id,
+                  },
+                };
+                ws.socket!.send(JSON.stringify(msg));
+              }}
               isOwner={data.isOwner}
               remainingTime={timeRemaining}
               controls={controls}
