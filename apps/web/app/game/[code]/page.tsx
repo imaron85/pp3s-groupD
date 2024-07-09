@@ -69,7 +69,12 @@ export default function Game({ params: { code } }: any) {
       {error ? <GameError /> : ""}
       {data ? (
         gameState === "waiting" ? (
-          <GameWaiting code={code} players={players} />
+          <GameWaiting
+            code={code}
+            players={players}
+            isOwner={data.isOwner}
+            ws={ws}
+          />
         ) : (
           ""
         )

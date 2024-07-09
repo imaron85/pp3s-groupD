@@ -45,6 +45,7 @@ export default function Join() {
         <div className="mt-8 w-full flex justify-center">
           <Link
             href={"/game/" + code?.replace(/ /g, "")}
+            prefetch={false}
             className="w-full bg-primary text-primary-foreground text-center hover:bg-primary/90 p-2 rounded-xl"
           >
             Join
