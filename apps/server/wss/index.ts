@@ -2,7 +2,13 @@ import { redisClient, redisPrefix } from "@/connectors";
 import { ServerWebSocket } from "bun";
 import cookieParser from "cookie-parser";
 import { Game, WsMessage } from "shared-types";
-import { leaveHandler, nextHandler, startHandler } from "./handlers";
+import {
+  answerHandler,
+  leaderboardHandler,
+  leaveHandler,
+  nextHandler,
+  startHandler,
+} from "./handlers";
 import { BehaviorSubject, Subscription } from "rxjs";
 
 export type WebSocketData = {
@@ -39,7 +45,7 @@ export const games = {
   addPlayer(key: string, player: string) {
     const tmp = new Map(gameSubject.value);
     tmp.get(key).players.add(player);
-    tmp.get(key).scores[player] = 0;
+    tmp.get(key).scores[player] = { round: 0, total: 0 };
     gameSubject.next(tmp);
   },
   removePlayer(key: string, player: string) {
@@ -55,8 +61,23 @@ export const games = {
   },
   addScore(key: string, player: string, score: number) {
     const tmp = new Map(gameSubject.value);
-    tmp.get(key).scores[player] += score;
+    tmp.get(key).scores[player] = {
+      round: score,
+      total: tmp.get(key).scores[player].total + Math.max(score, 0),
+    };
     gameSubject.next(tmp);
+  },
+  resetRound(key: string, player: string) {
+    const tmp = new Map(gameSubject.value);
+    tmp.get(key).scores[player] = { ...tmp.get(key).scores[player], round: 0 };
+    gameSubject.next(tmp);
+  },
+  allAnswered(key: string) {
+    return (
+      Object.values(gameSubject.value.get(key).scores).find(
+        (s) => s.round === 0
+      ) === undefined
+    );
   },
 };
 
@@ -117,6 +138,14 @@ export const wss = Bun.serve<WebSocketData>({
         }
         case "start": {
           startHandler(ws, msg);
+          break;
+        }
+        case "answer": {
+          answerHandler(ws, msg);
+          break;
+        }
+        case "leaderboard": {
+          leaderboardHandler(ws, msg);
           break;
         }
         default: {

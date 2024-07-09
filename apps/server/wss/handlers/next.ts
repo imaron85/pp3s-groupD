@@ -22,6 +22,11 @@ export const nextHandler = (
     command: "question",
     payload: nextQuestion,
   };
+
+  games.modify(ws.data.gameCode!, {
+    currentQuestion: game.currentQuestion + 1,
+  });
+
   ws.publish(`game-${ws.data.gameCode!}`, JSON.stringify(nextQuestionMessage));
   ws.send(JSON.stringify(nextQuestionMessage));
 };
