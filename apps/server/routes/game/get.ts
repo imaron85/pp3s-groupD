@@ -10,12 +10,20 @@ export const get = async (req, res) => {
       return;
     }
 
-    if (games.get(req.params.code).joinable === false) {
+    const game = games.get(req.params.code);
+
+    if (
+      // Game is not joinable
+      game.joinable === false &&
+      // And the user is not the owner or already in the game
+      !game.owner === req.session.id &&
+      !game.players.has(req.session.id)
+    ) {
       res.status(403).json({ error: "Game is running" });
       return;
     }
 
-    if (games.get(req.params.code).owner !== req.session.id)
+    if (game.owner !== req.session.id)
       games.addPlayer(req.params.code, req.session.id);
 
     const ws = sockets.get(req.session.id);
@@ -27,8 +35,8 @@ export const get = async (req, res) => {
       next: (newGames) => {
         const newPlayers: WsMessage = {
           command: "players",
-          payload: Array.from(newGames.get(req.params.code).players).map((id) =>
-            nicknames.get(id)
+          payload: Array.from(newGames.get(ws.data.gameCode).players).map(
+            (id) => nicknames.get(id)
           ),
         };
 
@@ -37,10 +45,8 @@ export const get = async (req, res) => {
     });
     res.status(200).json({
       message: "Joined game",
-      isOwner: games.get(req.params.code).owner === req.session.id,
-      players: Array.from(games.get(req.params.code).players).map((id) =>
-        nicknames.get(id)
-      ),
+      isOwner: game.owner === req.session.id,
+      players: Array.from(game.players).map((id) => nicknames.get(id)),
     });
   } catch (error) {
     console.error("Error subscribing to game:", error.message);

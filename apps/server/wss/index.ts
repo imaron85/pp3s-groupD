@@ -140,7 +140,7 @@ export const wss = Bun.serve<WebSocketData>({
       console.log("Closing socket:", ws.data.sessionId);
       ws.data.gameSubscription?.unsubscribe();
 
-      if (ws.data.gameCode) {
+      if (ws.data.gameCode && games.get(ws.data.gameCode).joinable) {
         games.removePlayer(ws.data.gameCode, ws.data.sessionId);
       }
       sockets.delete(ws.data.sessionId);

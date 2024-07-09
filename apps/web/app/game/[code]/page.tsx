@@ -17,6 +17,7 @@ export type GameState =
   | "waiting"
   | "error"
   | "game"
+  | "answered"
   | "leaderboard";
 
 export default function Game({ params: { code } }: any) {
@@ -34,6 +35,8 @@ export default function Game({ params: { code } }: any) {
     const time = Math.floor((endTime.getTime() - Date.now()) / 1000);
     const minutes = Math.floor(time / 60);
     const seconds = time % 60;
+
+    if (minutes < 0 || seconds < 0) return "0:00";
 
     return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
   };
@@ -102,7 +105,7 @@ export default function Game({ params: { code } }: any) {
   }, [isPending, error, data, ws.socket]);
 
   useEffect(() => {
-    if (gameState === "game") {
+    if (gameState === "game" || gameState === "answered") {
       setTimeRemaining(calcRemainingTime(new Date(currentQuestion?.endTime!)));
       const interval = setInterval(() => {
         setTimeRemaining(
@@ -140,6 +143,7 @@ export default function Game({ params: { code } }: any) {
                 currentQuestion?.choices?.map((choice) => choice.text) || []
               }
               onAnswer={(answer) => {
+                setGameState("answered");
                 const msg: WsMessage = {
                   command: "answer",
                   payload: {
@@ -152,6 +156,14 @@ export default function Game({ params: { code } }: any) {
               isOwner={data.isOwner}
               remainingTime={timeRemaining}
               controls={controls}
+            />
+          ) : (
+            ""
+          )}
+          {gameState === "answered" ? (
+            <GameLoading
+              text="Waiting for other players to answer"
+              time={timeRemaining}
             />
           ) : (
             ""

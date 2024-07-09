@@ -25,3 +25,13 @@ export const WsQuestion = z.object({
 });
 
 export type WsQuestion = z.infer<typeof WsQuestion>;
+
+export const WsScores = z.array(
+  z.object({
+    player: z.string(),
+    score: z.number(),
+    roundScore: z.number(),
+  })
+);
+
+export type WsScores = z.infer<typeof WsScores>;
