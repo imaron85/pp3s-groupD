@@ -10,7 +10,7 @@ import React, {
 import axios from "axios";
 import { backendUrl } from "../util";
 
-interface WebSocketContextType {
+export interface WebSocketContextType {
   socket: WebSocket | null;
 }
 
@@ -18,8 +18,6 @@ const WebSocketContext = createContext<WebSocketContextType>({ socket: null });
 
 export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
   const [socket, setSocket] = useState<WebSocket | null>(null);
-
-  console.log("WebSocketProvider Rendering:", socket);
 
   useEffect(() => {
     axios.get(backendUrl + "/ping", { withCredentials: true }).then(() => {
@@ -34,7 +32,6 @@ export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
 
       newSocket.onclose = () => {
         console.log("WebSocket connection closed");
-        setSocket(null);
       };
 
       newSocket.onerror = (event) => {

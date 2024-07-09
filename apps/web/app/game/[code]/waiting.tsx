@@ -1,9 +1,16 @@
+import { WsMessage } from "shared-types";
+import { WebSocketContextType } from "../../../src/providers";
+
 export default function GameWaiting({
   code,
   players,
+  isOwner,
+  ws,
 }: {
   code: string;
   players: string[];
+  isOwner: boolean;
+  ws: WebSocketContextType;
 }) {
   return (
     <div className="flex flex-col items-center justify-center h-screen bg-background">
@@ -28,6 +35,22 @@ export default function GameWaiting({
           </ul>
         </div>
       </div>
+      {isOwner && ws.socket ? (
+        <button
+          onClick={() => {
+            const msg: WsMessage = {
+              command: "start",
+              payload: code,
+            };
+            ws.socket!.send(JSON.stringify(msg));
+          }}
+          className="w-full max-w-md mt-12 bg-primary text-primary-foreground text-center hover:bg-primary/90 p-2 rounded-xl"
+        >
+          Start Game
+        </button>
+      ) : (
+        ""
+      )}
     </div>
   );
 }

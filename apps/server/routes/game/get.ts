@@ -12,7 +12,6 @@ export const get = async (req, res) => {
 
     games.addPlayer(req.params.code, req.session.id);
 
-    console.log("Session joining game:", req.session.id);
     const ws = sockets.get(req.session.id);
     ws.data.gameCode = req.params.code;
 
@@ -20,7 +19,6 @@ export const get = async (req, res) => {
 
     ws.data.gameSubscription = gameSubject.subscribe({
       next: (newGames) => {
-        console.log("New games:", newGames);
         const newPlayers: WsMessage = {
           command: "players",
           payload: Array.from(newGames.get(req.params.code).players).map((id) =>
@@ -33,6 +31,7 @@ export const get = async (req, res) => {
     });
     res.status(200).json({
       message: "Joined game",
+      isOwner: games.get(req.params.code).owner === req.session.id,
       players: Array.from(games.get(req.params.code).players).map((id) =>
         nicknames.get(id)
       ),

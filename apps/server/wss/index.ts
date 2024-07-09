@@ -49,7 +49,12 @@ export const games = {
 };
 
 // TODO: Remove when game creation is implemented
-games.set("123", { gameCode: "123", players: new Set(), joinable: true });
+games.set("123", {
+  gameCode: "123",
+  players: new Set(),
+  joinable: true,
+  owner: "593fde15-c1de-4ca5-b043-e2c1b244eff9",
+});
 
 export const wss = Bun.serve<WebSocketData>({
   port: process.env.WS_PORT ?? 3002,
@@ -65,7 +70,6 @@ export const wss = Bun.serve<WebSocketData>({
       });
     }
 
-    console.log("Fetching session:", sessionId);
     const session = await redisClient
       .get(redisPrefix + sessionId)
       .catch((err) => {
@@ -121,6 +125,7 @@ export const wss = Bun.serve<WebSocketData>({
       sockets.set(ws.data.sessionId, ws);
     }, // a socket is opened
     close(ws, code, message) {
+      console.log("Closing socket:", ws.data.sessionId);
       ws.data.gameSubscription?.unsubscribe();
 
       if (ws.data.gameCode) {
