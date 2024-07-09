@@ -1,19 +1,8 @@
 import express, { Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
 import { QuizSchema } from "shared-types"; // Ensure the path is correct
-import { Quiz as QuizType } from "shared-types"; // Ensure the path is correct
-import mongoose, { Schema, Document } from "mongoose";
+import { QuizModel } from "@/connectors/mongodb";
 
-const quizSchema = new Schema<QuizType & Document>({
-  _id: { type: String, required: true },
-  title: { type: String, required: true },
-  description: { type: String },
-  questions: [{ type: Object, required: true }],
-  author: { type: String },
-  createdAt: { type: Date, default: Date.now },
-});
-
-const QuizModel = mongoose.model<QuizType & Document>("Quiz", quizSchema);
 const quizRouter = express.Router();
 
 quizRouter.post("/create", async (req: Request, res: Response) => {

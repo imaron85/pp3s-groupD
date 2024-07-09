@@ -10,7 +10,13 @@ export const get = async (req, res) => {
       return;
     }
 
-    games.addPlayer(req.params.code, req.session.id);
+    if (games.get(req.params.code).joinable === false) {
+      res.status(403).json({ error: "Game is running" });
+      return;
+    }
+
+    if (games.get(req.params.code).owner !== req.session.id)
+      games.addPlayer(req.params.code, req.session.id);
 
     const ws = sockets.get(req.session.id);
     ws.data.gameCode = req.params.code;

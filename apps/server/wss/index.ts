@@ -48,14 +48,6 @@ export const games = {
   },
 };
 
-// TODO: Remove when game creation is implemented
-games.set("123", {
-  gameCode: "123",
-  players: new Set(),
-  joinable: true,
-  owner: "593fde15-c1de-4ca5-b043-e2c1b244eff9",
-});
-
 export const wss = Bun.serve<WebSocketData>({
   port: process.env.WS_PORT ?? 3002,
   async fetch(req, server) {
