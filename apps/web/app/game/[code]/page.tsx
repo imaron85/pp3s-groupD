@@ -31,7 +31,10 @@ export default function Game({ params: { code } }: any) {
     Question & { endTime: Date }
   >();
   const [timeRemaining, setTimeRemaining] = useState<string>("");
-  const [leaderboard, setLeaderboard] = useState<WsScores>([]);
+  const [leaderboard, setLeaderboard] = useState<{
+    leaderboard: WsScores;
+    isFinal: boolean;
+  }>({ leaderboard: [], isFinal: false });
 
   const calcRemainingTime = (endTime: Date) => {
     const time = Math.floor((endTime.getTime() - Date.now()) / 1000);
@@ -177,7 +180,8 @@ export default function Game({ params: { code } }: any) {
           )}
           {gameState === "leaderboard" ? (
             <GameLeaderboard
-              scores={leaderboard}
+              scores={leaderboard.leaderboard}
+              isFinal={leaderboard.isFinal}
               isOwner={data.isOwner}
               ws={ws}
               setGameState={setGameState}

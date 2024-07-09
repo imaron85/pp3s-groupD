@@ -13,6 +13,7 @@ export const leaderboardHandler = (
   if (game.owner !== ws.data.sessionId && !internal) return;
 
   if (ws.data.timer) clearTimeout(ws.data.timer);
+  delete ws.data.timer;
   games.resetRound(ws.data.gameCode!);
 
   const leaderboard: WsScores = Object.keys(game.scores).map((player) => ({
@@ -23,7 +24,10 @@ export const leaderboardHandler = (
 
   const leaderboardMessage: WsMessage = {
     command: "leaderboard",
-    payload: leaderboard,
+    payload: {
+      leaderboard: leaderboard,
+      isFinal: game.currentQuestion === game.quiz.questions.length - 1,
+    },
   };
   ws.publish(`game-${ws.data.gameCode!}`, JSON.stringify(leaderboardMessage));
   ws.send(JSON.stringify(leaderboardMessage));
