@@ -6,9 +6,10 @@ import { backendUrl } from "../../src/util";
 import { Game, Quiz } from "shared-types";
 import { Commet } from "react-loading-indicators";
 import { useEffect } from "react";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 
 export default function StartGame() {
+  const router = useRouter();
   const { isPending, error, data } = useQuery({
     queryKey: ["quizzes"],
     queryFn: async () => {
@@ -69,7 +70,10 @@ export default function StartGame() {
             ))}
           </div>
           <div className="mt-8">
-            <button className="bg-black text-white shadow transition-colors hover:bg-black/80 font-bold py-2 px-4 rounded-xl">
+          <button
+              onClick={() => router.push("/admin/game/create")}
+              className="bg-black text-white shadow transition-colors hover:bg-black/80 font-bold py-2 px-4 rounded-xl"
+            >
               Create New Quiz
             </button>
           </div>
