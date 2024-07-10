@@ -61,6 +61,7 @@ export const games = {
     gameSubject.next(tmp);
   },
   addScore(key: string, player: string, score: number) {
+    console.log("Adding score:", score);
     const tmp = new Map(gameSubject.value);
     tmp.get(key).scores[player] = {
       round: score,

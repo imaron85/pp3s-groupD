@@ -25,6 +25,7 @@ export default function Game({ params: { code } }: any) {
   const ws = useWebSocket();
   const controls = useAnimation();
 
+  const [locked, setLocked] = useState<boolean>(false);
   const [gameState, setGameState] = useState<GameState>("loading");
   const [players, setPlayers] = useState<string[]>([]);
   const [currentQuestion, setCurrentQuestion] = useState<
@@ -78,6 +79,7 @@ export default function Game({ params: { code } }: any) {
         break;
       }
       case "start": {
+        setLocked(false);
         setGameState("game");
         break;
       }
@@ -90,6 +92,8 @@ export default function Game({ params: { code } }: any) {
         break;
       }
       case "leaderboard": {
+        if (locked) return;
+        setLocked(true);
         setLeaderboard(msg.payload);
         setGameState("leaderboard");
         break;

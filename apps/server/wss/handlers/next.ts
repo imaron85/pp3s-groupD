@@ -18,7 +18,6 @@ export const nextHandler = (
         (choice) => ({ ...choice, isCorrect: undefined })
       ),
     },
-    // TODO: Add end time
     endTime: new Date(Date.now() + 30000),
   };
   const nextQuestionMessage: WsMessage = {
@@ -28,6 +27,8 @@ export const nextHandler = (
 
   games.modify(ws.data.gameCode!, {
     currentQuestion: game.currentQuestion + 1,
+    // Allow half answers to be half a second late to account for network delays
+    endTime: new Date(Date.now() + 30500),
   });
 
   ws.publish(`game-${ws.data.gameCode!}`, JSON.stringify(nextQuestionMessage));

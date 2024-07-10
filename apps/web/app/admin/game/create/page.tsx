@@ -1,10 +1,14 @@
-'use client';
+"use client";
 
 import { Navbar } from "@repo/ui/navbar";
 import { useState } from "react";
 import Switch from "react-switch";
-import { QueryClient, useMutation, useQueryClient } from '@tanstack/react-query';
-import { UseMutationOptions } from '@tanstack/react-query';
+import {
+  QueryClient,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
+import { UseMutationOptions } from "@tanstack/react-query";
 
 interface Choice {
   text: string;
@@ -29,10 +33,10 @@ interface QuizCreationResponse {
 
 const createQuiz = async (newQuiz: Quiz): Promise<QuizCreationResponse> => {
   console.log("Sending quiz data:", newQuiz);
-  const response = await fetch('http://localhost:3001/quiz/create', {
-    method: 'POST',
+  const response = await fetch("http://localhost:3001/quiz/create", {
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
     body: JSON.stringify(newQuiz),
   });
@@ -41,109 +45,141 @@ const createQuiz = async (newQuiz: Quiz): Promise<QuizCreationResponse> => {
   if (!response.ok) {
     const errorText = await response.text();
     console.error("Failed to create quiz:", errorText);
-    throw new Error('Failed to create quiz');
+    throw new Error("Failed to create quiz");
   }
   return await response.json();
 };
 
 const CreateGame = () => {
-  const [quizTitle, setQuizTitle] = useState<string>('');
-  const [quizDescription, setQuizDescription] = useState<string>('');
+  const [quizTitle, setQuizTitle] = useState<string>("");
+  const [quizDescription, setQuizDescription] = useState<string>("");
   const [questions, setQuestions] = useState<Question[]>([]);
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
 
   const queryClient = useQueryClient();
 
-  const mutationOptions: UseMutationOptions<QuizCreationResponse, Error, Quiz, unknown> = {
+  const mutationOptions: UseMutationOptions<
+    QuizCreationResponse,
+    Error,
+    Quiz,
+    unknown
+  > = {
     onSuccess: (data: QuizCreationResponse) => {
       queryClient.invalidateQueries({
-        queryKey: ['quizzes'],
+        queryKey: ["quizzes"],
       });
-      setQuizzes(currentQuizzes => [...currentQuizzes, data.quiz]);
-      setQuizTitle('');
-      setQuizDescription('');
+      setQuizzes((currentQuizzes) => [...currentQuizzes, data.quiz]);
+      setQuizTitle("");
+      setQuizDescription("");
       setQuestions([]);
-      alert('Quiz created successfully!');
+      alert("Quiz created successfully!");
     },
     onError: (error: Error) => {
       console.error("Error creating quiz:", error.message);
-      alert('Failed to create quiz. Please try again.');
-    }
+      alert("Failed to create quiz. Please try again.");
+    },
   };
 
-  const mutation = useMutation<QuizCreationResponse, Error, Quiz, unknown>({ mutationFn: createQuiz, ...mutationOptions }, new QueryClient());
+  const mutation = useMutation<QuizCreationResponse, Error, Quiz, unknown>(
+    { mutationFn: createQuiz, ...mutationOptions },
+    new QueryClient()
+  );
 
   const handleAddQuestion = () => {
     const newQuestion: Question = {
-      questionText: '',
+      questionText: "",
       choices: Array.from({ length: 4 }, () => ({
-        text: '',
-        isCorrect: false
-      }))
+        text: "",
+        isCorrect: false,
+      })),
     };
-    setQuestions(currentQuestions => [...currentQuestions, newQuestion]);
+    setQuestions((currentQuestions) => [...currentQuestions, newQuestion]);
   };
 
-  const handleQuestionTextChange = (newQuestionText: string, questionIndex: number) => {
-    setQuestions(currentQuestions =>
+  const handleQuestionTextChange = (
+    newQuestionText: string,
+    questionIndex: number
+  ) => {
+    setQuestions((currentQuestions) =>
       currentQuestions.map((question, index) =>
-        index === questionIndex ? { ...question, questionText: newQuestionText } : question
+        index === questionIndex
+          ? { ...question, questionText: newQuestionText }
+          : question
       )
     );
   };
 
-  const handleChoiceTextChange = (newChoiceText: string, questionIndex: number, choiceIndex: number) => {
-    setQuestions(currentQuestions =>
+  const handleChoiceTextChange = (
+    newChoiceText: string,
+    questionIndex: number,
+    choiceIndex: number
+  ) => {
+    setQuestions((currentQuestions) =>
       currentQuestions.map((question, qIndex) =>
-        qIndex === questionIndex ? {
-          ...question,
-          choices: question.choices.map((choice, cIndex) =>
-            cIndex === choiceIndex ? { ...choice, text: newChoiceText } : choice
-          )
-        } : question
+        qIndex === questionIndex
+          ? {
+              ...question,
+              choices: question.choices.map((choice, cIndex) =>
+                cIndex === choiceIndex
+                  ? { ...choice, text: newChoiceText }
+                  : choice
+              ),
+            }
+          : question
       )
     );
   };
 
   const handleDeleteQuestion = (questionIndex: number) => {
-    setQuestions(currentQuestions => currentQuestions.filter((_, index) => index !== questionIndex));
+    setQuestions((currentQuestions) =>
+      currentQuestions.filter((_, index) => index !== questionIndex)
+    );
   };
 
-  const handleCorrectChoiceToggle = (questionIndex: number, choiceIndex: number, isCorrect: boolean) => {
-    setQuestions(quizQuestions =>
+  const handleCorrectChoiceToggle = (
+    questionIndex: number,
+    choiceIndex: number,
+    isCorrect: boolean
+  ) => {
+    setQuestions((quizQuestions) =>
       quizQuestions.map((q, qIndex) =>
-        qIndex === questionIndex ? {
-          ...q,
-          choices: q.choices.map((c, cIndex) =>
-            cIndex === choiceIndex ? { ...c, isCorrect: isCorrect } : c
-          )
-        } : q
+        qIndex === questionIndex
+          ? {
+              ...q,
+              choices: q.choices.map((c, cIndex) =>
+                cIndex === choiceIndex ? { ...c, isCorrect: isCorrect } : c
+              ),
+            }
+          : q
       )
     );
   };
 
   const handleCreateNewQuiz = async () => {
-
-    if (!quizTitle || !quizDescription || questions.some(q => !q.questionText || q.choices.some(c => !c.text))) {
-      alert('All fields must be filled.');
+    if (
+      !quizTitle ||
+      !quizDescription ||
+      questions.some((q) => !q.questionText || q.choices.some((c) => !c.text))
+    ) {
+      alert("All fields must be filled.");
       return;
     }
-    if (questions.some(q => !q.choices.some(c => c.isCorrect))) {
-      alert('Each question must have at least one correct answer.');
+    if (questions.some((q) => !q.choices.some((c) => c.isCorrect))) {
+      alert("Each question must have at least one correct answer.");
       return;
     }
 
     const newQuiz: Quiz = {
       title: quizTitle,
       description: quizDescription,
-      questions: questions.map(q => ({
+      questions: questions.map((q) => ({
         questionText: q.questionText,
-        choices: q.choices.map(c => ({
+        choices: q.choices.map((c) => ({
           text: c.text,
           isCorrect: c.isCorrect,
-        }))
+        })),
       })),
-      author: "Test Author" // Assuming a default or user-provided author
+      author: "Test Author", // Assuming a default or user-provided author
     };
     console.log("Creating new quiz with data:", newQuiz);
     mutation.mutate(newQuiz);
@@ -155,7 +191,9 @@ const CreateGame = () => {
       <div className="p-4 max-w-2xl mx-auto">
         <h1 className="text-2xl font-bold mb-4">Create new quiz</h1>
         <div>
-          <label className="block text-sm font-medium text-gray-700 flex justify-between items-center">Quiz title:</label>
+          <label className="block text-sm font-medium text-gray-700 flex justify-between items-center">
+            Quiz title:
+          </label>
           <input
             type="text"
             value={quizTitle}
@@ -165,7 +203,9 @@ const CreateGame = () => {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 flex justify-between items-center">Quiz title:</label>
+          <label className="block text-sm font-medium text-gray-700 flex justify-between items-center">
+            Quiz title:
+          </label>
           <textarea
             value={quizDescription}
             onChange={(e) => setQuizDescription(e.target.value)}
@@ -192,24 +232,40 @@ const CreateGame = () => {
                   type="text"
                   placeholder="Enter question"
                   value={question.questionText}
-                  onChange={(q) => handleQuestionTextChange(q.target.value, questionIndex)}
+                  onChange={(q) =>
+                    handleQuestionTextChange(q.target.value, questionIndex)
+                  }
                 />
               </div>
               <div className="ml-5">
-                <label className="block text-sm font-medium text-gray-700 flex justify-between items-center">Choices:</label>
+                <label className="block text-sm font-medium text-gray-700 flex justify-between items-center">
+                  Choices:
+                </label>
                 {question.choices.map((choice, choiceIndex) => (
                   <div key={choiceIndex}>
                     <label className="block text-sm font-medium text-gray-700 flex justify-between items-center">
                       <input
                         type="text"
                         value={choice.text}
-                        onChange={(a) => handleChoiceTextChange(a.target.value, questionIndex, choiceIndex)}
+                        onChange={(a) =>
+                          handleChoiceTextChange(
+                            a.target.value,
+                            questionIndex,
+                            choiceIndex
+                          )
+                        }
                         placeholder="Enter choice"
                         className="mr-10 mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                       />
                       <Switch
                         checked={choice.isCorrect}
-                        onChange={(checked: boolean) => handleCorrectChoiceToggle(questionIndex, choiceIndex, checked)}
+                        onChange={(checked: boolean) =>
+                          handleCorrectChoiceToggle(
+                            questionIndex,
+                            choiceIndex,
+                            checked
+                          )
+                        }
                       />
                     </label>
                   </div>
@@ -230,7 +286,7 @@ const CreateGame = () => {
         <div className="mt-4 flex justify-center">
           <button
             type="button"
-            onClick={() => setQuizTitle('')}
+            onClick={() => setQuizTitle("")}
             className="mr-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
           >
             Cancel

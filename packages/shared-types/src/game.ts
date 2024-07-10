@@ -14,6 +14,7 @@ export const Game = z.object({
       total: z.number(),
     })
   ),
+  endTime: z.date().optional(),
 });
 
 export type Game = z.infer<typeof Game>;
