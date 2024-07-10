@@ -7,6 +7,7 @@ import { Game, Quiz } from "shared-types";
 import { Commet } from "react-loading-indicators";
 import { useEffect } from "react";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 
 export default function StartGame() {
   const { isPending, error, data } = useQuery({
@@ -69,9 +70,12 @@ export default function StartGame() {
             ))}
           </div>
           <div className="mt-8">
-            <button className="bg-black text-white shadow transition-colors hover:bg-black/80 font-bold py-2 px-4 rounded-xl">
+            <Link
+              href="/create"
+              className="bg-black text-white shadow transition-colors hover:bg-black/80 font-bold py-2 px-4 rounded-xl"
+            >
               Create New Quiz
-            </button>
+            </Link>
           </div>
         </div>
       )}
