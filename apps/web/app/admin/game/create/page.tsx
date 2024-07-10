@@ -190,7 +190,7 @@ const CreateGame = () => {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 flex justify-between items-center">Quiz title:</label>
+          <label className="block text-sm font-medium text-gray-700 flex justify-between items-center">Quiz description:</label>
           <textarea
             value={quizDescription}
             onChange={(e) => setQuizDescription(e.target.value)}
@@ -255,7 +255,7 @@ const CreateGame = () => {
         <div className="mt-4 flex justify-center">
           <button
             type="button"
-            onClick={() => setQuizTitle('')}
+            onClick={resetForm}
             className="mr-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
           >
             Cancel
