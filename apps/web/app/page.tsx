@@ -4,7 +4,7 @@ export default function Home() {
   return (
     <div className="flex flex-col items-center justify-center h-screen bg-background">
       <div className="space-y-6 text-center">
-        <h1 className="text-6xl font-bold tracking-tighter">Game Night</h1>
+        <h1 className="text-6xl font-bold tracking-tighter">Quiz Night</h1>
         <p className="text-muted-foreground text-xl">
           Create a new game or join an existing one.
         </p>

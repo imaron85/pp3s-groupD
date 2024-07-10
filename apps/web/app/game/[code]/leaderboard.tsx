@@ -2,6 +2,7 @@ import { WsMessage, WsScores } from "shared-types";
 import { WebSocketContextType } from "../../../src/providers";
 import { Dispatch, SetStateAction } from "react";
 import { GameState } from "./page";
+import Link from "next/link";
 
 export const GameLeaderboard = ({
   scores,
@@ -42,6 +43,7 @@ export const GameLeaderboard = ({
                 </div>
                 <div className="flex-1 ml-4">{score.player}</div>
                 <div>{score.score}</div>
+                <div className="text-xs ml-2">+{score.roundScore}</div>
               </div>
             ))}
         </div>
@@ -59,6 +61,16 @@ export const GameLeaderboard = ({
         >
           Next Question
         </button>
+      ) : (
+        ""
+      )}
+      {isFinal ? (
+        <Link
+          href="/"
+          className="w-full max-w-md mt-12 bg-primary text-primary-foreground text-center hover:bg-primary/90 p-2 rounded-xl"
+        >
+          Back to Home
+        </Link>
       ) : (
         ""
       )}

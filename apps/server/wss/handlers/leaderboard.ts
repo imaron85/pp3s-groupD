@@ -14,13 +14,15 @@ export const leaderboardHandler = (
 
   if (ws.data.timer) clearTimeout(ws.data.timer);
   delete ws.data.timer;
-  games.resetRound(ws.data.gameCode!);
 
+  console.log("Leaderboard:", game.scores);
   const leaderboard: WsScores = Object.keys(game.scores).map((player) => ({
     player: nicknames.get(player),
     score: game.scores[player].total,
     roundScore: Math.max(game.scores[player].round, 0),
   }));
+
+  games.resetRound(ws.data.gameCode!);
 
   const leaderboardMessage: WsMessage = {
     command: "leaderboard",

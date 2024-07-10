@@ -13,19 +13,23 @@ export const answerHandler = (
   const game = games.get(ws.data.gameCode!)!;
   console.log("Game:", game.currentQuestion);
 
-  // TODO: Ignore answer if too late
-
+  console.log("ENd time:", game.endTime.toLocaleTimeString());
+  console.log("Now:", new Date().toLocaleTimeString());
   if (
     game.quiz.questions[game.currentQuestion].choices[msg.payload.answerIndex]
-      .isCorrect
+      .isCorrect &&
+    new Date() < game.endTime
   ) {
-    games.addScore(ws.data.gameCode!, ws.data.sessionId, 100);
+    games.addScore(
+      ws.data.gameCode!,
+      ws.data.sessionId,
+      Math.round((game.endTime.getTime() - new Date().getTime()) / 500) * 10
+    );
   } else {
     games.addScore(ws.data.gameCode!, ws.data.sessionId, -100);
   }
 
   if (games.allAnswered(ws.data.gameCode!)) {
-    games.resetRound(ws.data.gameCode!);
     leaderboardHandler(ws, msg, true);
   }
 };
