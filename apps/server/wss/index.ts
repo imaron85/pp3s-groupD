@@ -22,6 +22,7 @@ export const sockets = new Map<string, ServerWebSocket<WebSocketData>>();
 export const nicknames = new Map<string, string>();
 // export const games = new Map<string, Game>();
 export const gameSubject = new BehaviorSubject<Map<string, Game>>(new Map());
+export const socketMemory = new Map<string, WebSocketData>();
 
 export const games = {
   set(key: string, value: Game) {
@@ -169,12 +170,27 @@ export const wss = Bun.serve<WebSocketData>({
           ?.close(1000, "Replaced by new connection");
       }
       sockets.set(ws.data.sessionId, ws);
+
+      if (socketMemory.has(ws.data.sessionId)) {
+        ws.data = socketMemory.get(ws.data.sessionId)!;
+        socketMemory.delete(ws.data.sessionId);
+        // re-subscribe to the game
+        if (ws.data.gameCode) {
+          games.addPlayer(ws.data.gameCode, ws.data.sessionId);
+          ws.subscribe(`game-${ws.data.gameCode}`);
+        }
+      }
     }, // a socket is opened
     close(ws, code, message) {
-      console.log("Closing socket:", ws.data.sessionId);
+      // Save the socket data in memory for reconnection because they are in a game
+      if (games.has(ws.data.gameCode!))
+        socketMemory.set(ws.data.sessionId, ws.data);
+      else socketMemory.delete(ws.data.sessionId);
+
+      console.log("Closing socket:", ws.data.sessionId, ws.data.gameCode);
       ws.data.gameSubscription?.unsubscribe();
 
-      if (ws.data.gameCode && games.get(ws.data.gameCode).joinable) {
+      if (ws.data.gameCode && games.get(ws.data.gameCode)?.joinable) {
         games.removePlayer(ws.data.gameCode, ws.data.sessionId);
       }
       sockets.delete(ws.data.sessionId);

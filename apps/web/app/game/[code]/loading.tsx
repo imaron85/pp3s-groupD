@@ -10,8 +10,18 @@ export default function GameLoading({
   return (
     <div className="w-screen h-screen flex flex-col justify-center items-center">
       <Commet color="black" size="medium" text="" textColor="" />
-      {text ? <h1 className="text-3xl font-bold mt-12">{text}</h1> : ""}
-      {time ? <h1 className="text-3xl font-bold mt-6">{time} remaining</h1> : ""}
+      {text ? (
+        <h1 className="text-3xl font-bold mt-12 text-center">{text}</h1>
+      ) : (
+        ""
+      )}
+      {time ? (
+        <h1 className="text-3xl font-bold mt-6 text-center">
+          {time} remaining
+        </h1>
+      ) : (
+        ""
+      )}
     </div>
   );
 }
