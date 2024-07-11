@@ -1,5 +1,6 @@
 "use client";
 
+import Head from "next/head";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -22,6 +23,9 @@ export default function Join() {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-background">
+      <Head>
+        <title>Join - Quiz Night</title>
+      </Head>
       <div className="max-w-2xl w-full px-6 sm:px-8 lg:px-12">
         <div className="text-center">
           <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl md:text-6xl">

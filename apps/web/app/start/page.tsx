@@ -8,6 +8,7 @@ import { Commet } from "react-loading-indicators";
 import { useEffect } from "react";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import Head from "next/head";
 
 export default function StartGame() {
   const { isPending, error, data } = useQuery({
@@ -41,6 +42,9 @@ export default function StartGame() {
 
   return (
     <div className="w-screen h-screen flex justify-center items-center">
+      <Head>
+        <title>Start Game - Quiz Night</title>
+      </Head>
       {isPending ? (
         <Commet color="black" size="medium" text="" textColor="" />
       ) : (
