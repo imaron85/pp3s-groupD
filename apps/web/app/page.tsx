@@ -1,8 +1,12 @@
+import Head from "next/head";
 import Link from "next/link";
 
 export default function Home() {
   return (
     <div className="flex flex-col items-center justify-center h-screen bg-background">
+      <Head>
+        <title>Quiz Night</title>
+      </Head>
       <div className="space-y-6 text-center">
         <h1 className="text-6xl font-bold tracking-tighter">Quiz Night</h1>
         <p className="text-muted-foreground text-xl">

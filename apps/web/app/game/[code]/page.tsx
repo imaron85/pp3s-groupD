@@ -12,6 +12,7 @@ import GameWaiting from "./waiting";
 import GamePlaying from "./playing";
 import { useAnimation } from "framer-motion";
 import { GameLeaderboard } from "./leaderboard";
+import Head from "next/head";
 
 export type GameState =
   | "loading"
@@ -136,6 +137,9 @@ export default function Game({ params: { code } }: any) {
 
   return (
     <>
+      <Head>
+        <title>{data?.quiz.title} - Quiz Night</title>
+      </Head>
       {isPending ? <GameLoading /> : ""}
       {error ? <GameError error={error} /> : ""}
       {data ? (

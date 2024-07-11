@@ -11,6 +11,7 @@ import { backendUrl } from "../../src/util";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Link from "next/link";
+import Head from "next/head";
 
 interface Choice {
   text: string;
@@ -191,6 +192,9 @@ export default function CreateQuiz() {
 
   return (
     <div className="w-screen h-screen flex flex-col justify-center items-center">
+      <Head>
+        <title>Create Quiz - Quiz Night</title>
+      </Head>
       {created ? (
         <div className="max-w-6xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
           <h1 className="text-3xl font-bold mb-6">Quiz created!</h1>
