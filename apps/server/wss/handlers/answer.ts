@@ -1,5 +1,5 @@
 import { ServerWebSocket } from "bun";
-import { games, WebSocketData } from "..";
+import { games, sockets, WebSocketData } from "..";
 import { WsMessage, WsQuestion } from "shared-types";
 import { nextHandler } from "./next";
 import { leaderboardHandler } from "./leaderboard";
@@ -8,13 +8,12 @@ export const answerHandler = (
   ws: ServerWebSocket<WebSocketData>,
   msg?: WsMessage
 ) => {
-  console.log("Answer received:", msg);
-
   const game = games.get(ws.data.gameCode!)!;
-  console.log("Game:", game.currentQuestion);
 
-  console.log("ENd time:", game.endTime.toLocaleTimeString());
-  console.log("Now:", new Date().toLocaleTimeString());
+  console.log("ANSWER FIRED: Debug info:\n GAME:", game);
+  console.log("DATA: ", ws.data);
+  console.log("MSG: ", msg);
+
   if (
     game.quiz.questions[game.currentQuestion].choices[msg.payload.answerIndex]
       .isCorrect &&
@@ -31,5 +30,7 @@ export const answerHandler = (
 
   if (games.allAnswered(ws.data.gameCode!)) {
     leaderboardHandler(ws, msg, true);
+    clearTimeout(sockets.get(game.owner)?.data.timer);
+    delete sockets.get(game.owner)?.data.timer;
   }
 };

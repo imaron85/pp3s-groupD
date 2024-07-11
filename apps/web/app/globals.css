@@ -74,3 +74,22 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* For Responsive Text Sizing */
+@media (min-width: 576px) {
+  html {
+    font-size: 14px;
+  }
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+@media (min-width: 992px) {
+  html {
+    font-size: 18px;
+  }
+}

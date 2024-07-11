@@ -21,17 +21,28 @@ export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     axios.get(backendUrl + "/ping", { withCredentials: true }).then(() => {
+      let replaceTimer: Timer | null = null;
       const newSocket = new WebSocket(
         process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:3002"
       );
 
       newSocket.onopen = () => {
+        if (replaceTimer) clearTimeout(replaceTimer);
         console.log("WebSocket connection opened");
         setSocket(newSocket);
       };
 
       newSocket.onclose = () => {
         console.log("WebSocket connection closed");
+        replaceTimer = setTimeout(() => {
+          // Retry connection after 500ms
+          if (newSocket.CLOSED)
+            setSocket(
+              new WebSocket(
+                process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:3002"
+              )
+            );
+        }, 500);
       };
 
       newSocket.onerror = (event) => {

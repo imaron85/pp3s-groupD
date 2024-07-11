@@ -9,6 +9,8 @@ export const nextHandler = (
 ) => {
   const game = games.get(ws.data.gameCode!)!;
 
+  if (ws.data.timer) clearTimeout(ws.data.timer);
+
   if (ws.data.sessionId !== game.owner) return;
 
   const nextQuestion: WsQuestion = {
@@ -36,6 +38,7 @@ export const nextHandler = (
 
   if (!ws.data.timer)
     ws.data.timer = setTimeout(() => {
+      console.log("!!!!!TIMER FIRED!!!!!");
       leaderboardHandler(ws);
     }, 30000);
 };
