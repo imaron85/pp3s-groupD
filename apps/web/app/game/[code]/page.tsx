@@ -107,6 +107,7 @@ export default function Game({ params: { code } }: any) {
   };
 
   useEffect(() => {
+    document.title = `${data?.quiz?.title || "Quiz"} - Quiz Night`;
     if (ws.socket) {
       ws.socket.onmessage = (event) => {
         console.log("1Message from server ", event.data);
@@ -138,7 +139,7 @@ export default function Game({ params: { code } }: any) {
   return (
     <>
       <Head>
-        <title>{data?.quiz.title} - Quiz Night</title>
+        <title>{data?.quiz?.title} - Quiz Night</title>
       </Head>
       {isPending ? <GameLoading /> : ""}
       {error ? <GameError error={error} /> : ""}
