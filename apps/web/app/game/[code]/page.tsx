@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import GameLoading from "./loading";
 import GameError from "./error";
-import { useWebSocket } from "../../../src/providers";
+import { useNickname, useWebSocket } from "../../../src/providers";
 import { Question, QuestionSchema, WsMessage, WsScores } from "shared-types";
 import { backendUrl } from "../../../src/util";
 import axios, { AxiosError } from "axios";
@@ -23,7 +23,7 @@ export type GameState =
 
 export default function Game({ params: { code } }: any) {
   const ws = useWebSocket();
-  const controls = useAnimation();
+  const nickname = useNickname();
 
   const [locked, setLocked] = useState<boolean>(false);
   const [gameState, setGameState] = useState<GameState>("loading");
@@ -169,7 +169,6 @@ export default function Game({ params: { code } }: any) {
               }}
               isOwner={data.isOwner}
               remainingTime={timeRemaining}
-              controls={controls}
             />
           ) : (
             ""
@@ -189,6 +188,7 @@ export default function Game({ params: { code } }: any) {
               isOwner={data.isOwner}
               ws={ws}
               setGameState={setGameState}
+              nickname={nickname}
             />
           ) : (
             ""

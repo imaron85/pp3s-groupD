@@ -9,14 +9,12 @@ export default function GamePlaying({
   onAnswer,
   isOwner,
   remainingTime,
-  controls,
 }: {
   remainingTime: string;
   question: string;
   answers: string[];
   onAnswer: (answerIndex: number) => void;
   isOwner: boolean;
-  controls: AnimationControls;
 }) {
   const answerColors = [
     "bg-red-500",
@@ -45,10 +43,9 @@ export default function GamePlaying({
               </div>
             </div>
             <div className="w-full h-4 bg-muted rounded-full overflow-hidden">
-              <motion.div
-                initial={{ width: "100%" }}
+              <div
+                id="timer"
                 className="h-full bg-primary transition-all duration-300"
-                animate={controls}
               />
             </div>
           </div>

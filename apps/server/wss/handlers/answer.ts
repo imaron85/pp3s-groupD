@@ -10,10 +10,6 @@ export const answerHandler = (
 ) => {
   const game = games.get(ws.data.gameCode!)!;
 
-  console.log("ANSWER FIRED: Debug info:\n GAME:", game);
-  console.log("DATA: ", ws.data);
-  console.log("MSG: ", msg);
-
   if (
     game.quiz.questions[game.currentQuestion].choices[msg.payload.answerIndex]
       .isCorrect &&
@@ -22,7 +18,8 @@ export const answerHandler = (
     games.addScore(
       ws.data.gameCode!,
       ws.data.sessionId,
-      Math.round((game.endTime.getTime() - new Date().getTime()) / 500) * 10
+      100 +
+        Math.round((game.endTime.getTime() - new Date().getTime()) / 500) * 10
     );
   } else {
     games.addScore(ws.data.gameCode!, ws.data.sessionId, -100);

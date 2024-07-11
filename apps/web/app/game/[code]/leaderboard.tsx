@@ -10,17 +10,28 @@ export const GameLeaderboard = ({
   ws,
   setGameState,
   isFinal,
+  nickname,
 }: {
   scores: WsScores;
   isOwner: boolean;
   ws: WebSocketContextType;
   setGameState: Dispatch<SetStateAction<GameState>>;
   isFinal: boolean;
+  nickname: string;
 }) => {
   const top = ["1st", "2nd", "3rd", "4th", "5th", "6th"];
 
   return (
-    <div className="w-screen h-screen flex flex-col justify-center items-center">
+    <div
+      id={
+        isOwner
+          ? ""
+          : scores.find((s) => s.player === nickname)?.roundScore !== 0
+            ? "correctAnswer"
+            : "incorrectAnswer"
+      }
+      className="w-screen h-screen flex flex-col justify-center items-center"
+    >
       <div className="w-full max-w-md rounded-lg bg-white shadow-md">
         <div className="border-b px-6 py-4">
           <h2 className="text-lg font-bold">
