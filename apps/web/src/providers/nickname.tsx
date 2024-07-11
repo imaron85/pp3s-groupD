@@ -2,9 +2,11 @@
 
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { use, useEffect, useState } from "react";
+import { createContext, use, useContext, useEffect, useState } from "react";
 import { backendUrl } from "../util";
 import { Commet } from "react-loading-indicators";
+
+const NicknameContext = createContext<string>("");
 
 export const NicknameProvider = ({
   children,
@@ -44,7 +46,7 @@ export const NicknameProvider = ({
   }, [mutation.isSuccess]);
 
   return (
-    <>
+    <NicknameContext.Provider value={nickname}>
       {nickname ? (
         children
       ) : (
@@ -82,6 +84,8 @@ export const NicknameProvider = ({
           </div>
         </>
       )}
-    </>
+    </NicknameContext.Provider>
   );
 };
+
+export const useNickname = () => useContext(NicknameContext);

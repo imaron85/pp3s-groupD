@@ -1,5 +1,5 @@
 import { ServerWebSocket } from "bun";
-import { games, nicknames, socketMemory, WebSocketData } from "..";
+import { games, nicknames, socketMemory, sockets, WebSocketData } from "..";
 import { WsMessage, WsQuestion, WsScores } from "shared-types";
 
 export const leaderboardHandler = (
@@ -31,13 +31,18 @@ export const leaderboardHandler = (
     },
   };
 
+  ws.publish(`game-${ws.data.gameCode!}`, JSON.stringify(leaderboardMessage));
+  ws.send(JSON.stringify(leaderboardMessage));
+
   // game cleanup
   if (game.currentQuestion === game.quiz.questions.length - 1) {
     games.delete(ws.data.gameCode!);
     socketMemory.delete(ws.data.sessionId);
-    delete ws.data.gameCode;
+    sockets.forEach((socket) => {
+      if (socket.data.gameCode === ws.data.gameCode) {
+        socket.data.gameCode = undefined;
+        socket.data.gameSubscription?.unsubscribe();
+      }
+    });
   }
-
-  ws.publish(`game-${ws.data.gameCode!}`, JSON.stringify(leaderboardMessage));
-  ws.send(JSON.stringify(leaderboardMessage));
 };

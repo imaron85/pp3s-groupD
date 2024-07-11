@@ -93,3 +93,48 @@
     font-size: 18px;
   }
 }
+
+@keyframes shrinkTimer {
+  0% {
+    width: 100%;
+  }
+  100% {
+    width: 0%;
+  }
+}
+
+#timer {
+  animation: shrinkTimer 30s linear;
+}
+
+@keyframes correctAnswer {
+  0% {
+    background-color: white;
+  }
+  20% {
+    background-color: #00ff00;
+  }
+  100% {
+    background-color: white;
+  }
+}
+
+#correctAnswer {
+  animation: correctAnswer 2s ease-out;
+}
+
+@keyframes incorrectAnswer {
+  0% {
+    background-color: white;
+  }
+  20% {
+    background-color: #ff0000;
+  }
+  100% {
+    background-color: white;
+  }
+}
+
+#incorrectAnswer {
+  animation: incorrectAnswer 2s ease-out;
+}
